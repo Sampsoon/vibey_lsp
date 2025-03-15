@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# API keys and credentials for testing that I don't want to commit to the repo
+api-keys.json
