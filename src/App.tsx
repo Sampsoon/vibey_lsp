@@ -1,25 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import './App.css';
 import { detectKeyPress } from './userActionDetection';
 
 function App() {
-  const [keyPressCount, setKeyPressCount] = useState(0);
-
   useEffect(() => {
-    const cleanup = detectKeyPress(() => {
-      setKeyPressCount((prev) => prev + 1);
-      console.log('X key was pressed!');
-    });
+    const cleanupY = detectKeyPress(() => {
+      console.log('Y key was pressed!');
+      if (chrome.runtime && chrome.runtime.sendMessage) {
+        console.log('Sending message to service worker');
+        chrome.runtime.sendMessage({ action: 'activate' });
+      }
+    }, 'y');
 
-    return cleanup;
+    return () => {
+      cleanupY();
+    };
   }, []);
 
   return (
     <>
       <div>hello Scribe app</div>
       <div>
-        <p>Press the 'x' key to trigger the action</p>
-        <p>X key pressed: {keyPressCount} times</p>
+        <p>Press the 'y' key to activate the service worker</p>
       </div>
     </>
   );

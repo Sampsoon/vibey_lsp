@@ -14,6 +14,12 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(__dirname, 'index.html'),
+        onUserDictateWorker: resolve(__dirname, 'src/onUserDictateWorker.ts'),
+      },
+      output: {
+        entryFileNames: (chunkInfo) => {
+          return chunkInfo.name === 'onUserDictateWorker' ? '[name].js' : 'assets/[name]-[hash].js';
+        },
       },
     },
     copyPublicDir: true,

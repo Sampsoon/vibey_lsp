@@ -7,9 +7,14 @@
     "default_popup": "index.html",
     "default_title": "Scribe"
   },
+  "background": {
+    "service_worker": "onUserDictateWorker.js",
+    "type": "module"
+  },
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "permissions": ["scripting"]
 }
