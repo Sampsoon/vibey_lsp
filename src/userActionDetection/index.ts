@@ -1,2 +1,2 @@
 export type { UserActionDetection } from './userActionDetection';
-export { detectKeyPress } from './userActionDetection';
+export * from './userActionDetection';
