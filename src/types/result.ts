@@ -1,12 +1,3 @@
-export enum ErrorType {
-  GenericError = 'GenericError',
-}
-
-export interface Error {
-  type: ErrorType;
-  message: string;
-}
-
 export type Result<T> = Ok<T> | Err;
 
 export interface Ok<T> {
@@ -24,9 +15,9 @@ export const ok = <T>(value: T): Ok<T> => ({
   value,
 });
 
-export const err = (type: ErrorType, message: string): Err => ({
+export const err = (error: Error): Err => ({
   _tag: 'Err',
-  error: { type, message },
+  error,
 });
 
 export const Result = {
@@ -49,7 +40,7 @@ export const Result = {
   mapErr: <T>(result: Result<T>, fn: (error: Error) => Error): Result<T> => {
     if (Result.isErr(result)) {
       const newError = fn(result.error);
-      return err(newError.type, newError.message);
+      return err(newError);
     }
     return result;
   },
