@@ -7,7 +7,7 @@ export interface CodeBlockConfig {
 }
 
 export interface CodeBlock {
-  code: HTMLElement;
+  html: HTMLElement;
 }
 
 export const CODE_SELECTORS = {

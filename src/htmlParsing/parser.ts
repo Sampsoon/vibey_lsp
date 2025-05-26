@@ -1,8 +1,8 @@
-import { CodeBlockConfig, CodeBlock, CODE_SELECTORS } from './types';
+import { CodeBlockConfig, CodeBlock } from './types';
 
 export const findCodeBlocks = (
   document: Document, 
-  config: CodeBlockConfig = { selectors: Object.values(CODE_SELECTORS) }
+  config: CodeBlockConfig
 ): CodeBlock[] => {
   const codeBlocks: CodeBlock[] = [];
   
@@ -13,7 +13,7 @@ export const findCodeBlocks = (
       const htmlElement = element as HTMLElement;
       
       const codeBlock: CodeBlock = {
-        code: htmlElement
+        html: htmlElement
       };
       
       codeBlocks.push(codeBlock);
