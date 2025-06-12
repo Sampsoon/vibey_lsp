@@ -1,5 +1,5 @@
 import { CODE_SELECTORS } from '../htmlParsing';
-import { findCodeBlocks } from '../htmlParsing/parser';
+import { findCodeBlocks, isCodeBlockProcessed, markCodeBlockAsProcessed } from '../htmlParsing/parser';
 import { OpenAI } from 'openai';
 import { createOpenAiInterface, LlmInterface } from '../llm';
 import { attachHoverHints, retrieveAnnotations, setupHoverHintState, setupHoverHintTriggers } from '../hoverHints';
@@ -25,8 +25,11 @@ async function run(state: HoverHintState, llmInterface: LlmInterface) {
 
   const blocks = findCodeBlocks(document, { selectors: Object.values(CODE_SELECTORS) });
 
+  const unprocessedBlocks = blocks.filter((b) => !isCodeBlockProcessed(b));
+
   await Promise.all(
-    blocks.map(async (b) => {
+    unprocessedBlocks.map(async (b) => {
+      markCodeBlockAsProcessed(b);
       const hoverHintList = await retrieveAnnotations(b, llmInterface);
       attachHoverHints(hoverHintList, state);
     }),

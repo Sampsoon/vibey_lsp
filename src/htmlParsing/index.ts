@@ -1,10 +1,3 @@
-export { findCodeBlocks } from './parser';
-export type {
-  CodeBlockConfig,
-  CodeBlock,
-  CodeBlockSelector,
-  CodeSelectors as SelectorKey
-} from './types';
-export {
-  CODE_SELECTORS
-} from './types';
+export { findCodeBlocks, markCodeBlockAsProcessed, isCodeBlockProcessed } from './parser';
+export type { CodeBlockConfig, CodeBlock, CodeBlockSelector, CodeSelectors } from './types';
+export { CODE_SELECTORS } from './types';
