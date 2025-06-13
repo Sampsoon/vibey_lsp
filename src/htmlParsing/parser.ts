@@ -1,7 +1,6 @@
 import { CodeBlockConfig, CodeBlock } from './types';
 
-const CODE_BLOCK_PROCESSED_CLASS_NAME = 'vibey-lsp-processed';
-
+// TOOD: delete or add new code block search logic here
 export const findCodeBlocks = (document: Document, config: CodeBlockConfig): CodeBlock[] => {
   const codeBlocks: CodeBlock[] = [];
 
@@ -20,12 +19,4 @@ export const findCodeBlocks = (document: Document, config: CodeBlockConfig): Cod
   });
 
   return codeBlocks;
-};
-
-export const markCodeBlockAsProcessed = (codeBlock: CodeBlock) => {
-  codeBlock.html.classList.add(CODE_BLOCK_PROCESSED_CLASS_NAME);
-};
-
-export const isCodeBlockProcessed = (codeBlock: CodeBlock) => {
-  return codeBlock.html.classList.contains(CODE_BLOCK_PROCESSED_CLASS_NAME);
 };
