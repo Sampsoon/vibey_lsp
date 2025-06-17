@@ -1,4 +1,4 @@
-import { CODE_BLOCK_ALREADY_PROCESSED, CodeBlockStablityTimer, CodeBlockTrackingState } from './types';
+import { CODE_BLOCK_ALREADY_PROCESSED, CodeBlockStabilityTimer, CodeBlockTrackingState } from './types';
 
 const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'codeBlockId';
 
@@ -14,7 +14,7 @@ export const getIdFromCodeBlock = (element: HTMLElement) => {
 
 export const setupCodeBlockTracking = (): CodeBlockTrackingState => {
   return {
-    codeBlockLookupTable: new Map<string, CodeBlockStablityTimer>(),
+    codeBlockLookupTable: new Map<string, CodeBlockStabilityTimer>(),
   };
 };
 

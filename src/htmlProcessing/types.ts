@@ -24,8 +24,8 @@ export type CodeSelectors = keyof typeof CODE_SELECTORS;
 export const CODE_BLOCK_ALREADY_PROCESSED = 'Code Block Already Processed';
 export type CodeBlockAlreadyProcessed = typeof CODE_BLOCK_ALREADY_PROCESSED;
 
-export type CodeBlockStablityTimer = number | CodeBlockAlreadyProcessed;
+export type CodeBlockStabilityTimer = number | CodeBlockAlreadyProcessed;
 
 export interface CodeBlockTrackingState {
-  codeBlockLookupTable: Map<string, CodeBlockStablityTimer>;
+  codeBlockLookupTable: Map<string, CodeBlockStabilityTimer>;
 }

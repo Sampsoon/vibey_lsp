@@ -4,7 +4,7 @@ export type {
   CodeBlockSelector,
   CodeSelectors,
   CodeBlockAlreadyProcessed,
-  CodeBlockStablityTimer,
+  CodeBlockStabilityTimer,
   CodeBlockTrackingState,
 } from './types';
 
