@@ -11,8 +11,8 @@ export interface CodeBlock {
 }
 
 export const CODE_SELECTORS = {
-  CHATGPT_MARKDOWN: {
-    selector: 'code[class*="language-"]',
+  MARKDOWN: {
+    selector: 'code',
   },
   CHATGPT_CANVAS: {
     selector: 'div.cm-content[data-language]',
