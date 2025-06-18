@@ -10,7 +10,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["contentScripts/processCodeBlocks.js"]
+      "js": ["src/contentScripts/processCodeBlocks.ts"]
     }
   ],
   "icons": {
