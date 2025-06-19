@@ -15,8 +15,6 @@ export type HoverHint = z.infer<typeof hoverHintSchema>;
 
 export type HoverHintList = z.infer<typeof hoverHintListSchema>;
 
-export type ElementLookupTable = Map<string, HTMLElement[]>;
-
 export const NO_TIMEOUT_ACTIVE = 'Not Timeout Active';
 export type NoTimeoutActive = typeof NO_TIMEOUT_ACTIVE;
 
