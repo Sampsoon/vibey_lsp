@@ -14,6 +14,8 @@ export {
   setupCodeBlockTracking,
   clearCodeBlockTimeoutIfExists,
   setCodeBlockTimeout,
+  CODE_TOKEN_ID_NAME,
+  attachIdsToTokens,
 } from './codeBlocks';
 
 export { searchForCodeBlockElementIsPartOf, findCodeBlocksOnPage } from './parsing';

@@ -1,11 +1,5 @@
-import {
-  HoverHintList,
-  CODE_TOKEN_ID_NAME,
-  NO_TIMEOUT_ACTIVE,
-  TimeoutId,
-  NoTimeoutActive,
-  HoverHintState,
-} from './types';
+import { CODE_TOKEN_ID_NAME } from '../htmlProcessing';
+import { HoverHintList, NO_TIMEOUT_ACTIVE, TimeoutId, NoTimeoutActive, HoverHintState } from './types';
 
 const MOUSE_EVENTS = {
   MOUSE_ENTER: 'mouseenter',

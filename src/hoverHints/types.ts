@@ -1,6 +1,5 @@
 import * as z from 'zod';
-
-export const CODE_TOKEN_ID_NAME = 'codeTokenId';
+import { CODE_TOKEN_ID_NAME } from '../htmlProcessing';
 
 export const hoverHintSchema = z.object({
   [CODE_TOKEN_ID_NAME]: z.string(),

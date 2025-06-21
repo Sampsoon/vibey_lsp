@@ -1,6 +1,6 @@
-import { CodeBlock } from '../htmlProcessing';
+import { attachIdsToTokens, CodeBlock } from '../htmlProcessing';
 import { LlmInterface } from '../llm';
-import { CODE_TOKEN_ID_NAME, HoverHintList, hoverHintListSchema } from './types';
+import { HoverHintList, hoverHintListSchema } from './types';
 
 const RETRIEVAL_HOVER_HINTS_PROMPT = (code: CodeBlock) => `# Code Analysis Prompt for Hover Hints
 
@@ -144,32 +144,8 @@ ${code.html.innerHTML}
 export const MAX_RETRIES = 5;
 export const RETRY_DELAY = 1000;
 
-const getDomLeaves = (element: HTMLElement): HTMLElement[] => {
-  return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
-};
-
-const generateTokenHashId = (element: HTMLElement): string => {
-  const outerHTML = element.outerHTML;
-  let hash = 5381;
-  for (let i = 0; i < outerHTML.length; i++) {
-    hash = (hash << 5) + hash + outerHTML.charCodeAt(i);
-  }
-  return (hash >>> 0).toString(36);
-};
-
-const attachIds = (code: CodeBlock) => {
-  const { html } = code;
-
-  const codeTokens = getDomLeaves(html);
-
-  codeTokens.forEach((token) => {
-    const id = generateTokenHashId(token);
-    token.dataset[CODE_TOKEN_ID_NAME] = id;
-  });
-};
-
 export const retrieveAnnotations = async (code: CodeBlock, llm: LlmInterface): Promise<HoverHintList> => {
-  attachIds(code);
+  attachIdsToTokens(code);
 
   let currentRetryDelay = RETRY_DELAY;
 
