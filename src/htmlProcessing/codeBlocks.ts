@@ -8,34 +8,43 @@ const getDomLeaves = (element: HTMLElement): HTMLElement[] => {
   return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
 };
 
-const generateTokenHashId = (element: HTMLElement): string => {
+const generateTokenHashId = (element: HTMLElement, codeBlockId: string): string => {
   const outerHTML = element.outerHTML;
   let hash = 5381;
   for (let i = 0; i < outerHTML.length; i++) {
     hash = (hash << 5) + hash + outerHTML.charCodeAt(i);
   }
-  return (hash >>> 0).toString(36);
+  const id = (hash >>> 0).toString(36);
+  return `${codeBlockId}-${id}`;
 };
 
 export const attachIdsToTokens = (code: CodeBlock) => {
-  const { html } = code;
+  const { html, codeBlockId } = code;
 
   const codeTokens = getDomLeaves(html);
 
   codeTokens.forEach((token) => {
-    const id = generateTokenHashId(token);
+    const id = generateTokenHashId(token, codeBlockId);
     token.dataset[CODE_TOKEN_ID_NAME] = id;
   });
 };
 
-export const addIdToCodeBlock = (element: HTMLElement) => {
-  const id = crypto.randomUUID();
+const addIdToCodeBlock = (element: HTMLElement) => {
+  const id = ((Math.random() * 0x100000000) | 0).toString(36);
   element.dataset[CODE_BLOCK_ID_ATTRIBUTE_NAME] = id;
   return id;
 };
 
-export const getIdFromCodeBlock = (element: HTMLElement) => {
+const getIdFromCodeBlock = (element: HTMLElement) => {
   return element.dataset[CODE_BLOCK_ID_ATTRIBUTE_NAME];
+};
+
+export const getOrAddIdToCodeBlock = (element: HTMLElement) => {
+  const id = getIdFromCodeBlock(element);
+  if (id) {
+    return id;
+  }
+  return addIdToCodeBlock(element);
 };
 
 export const setupCodeBlockTracking = (): CodeBlockTrackingState => {

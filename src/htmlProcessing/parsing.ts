@@ -1,31 +1,35 @@
+import { getOrAddIdToCodeBlock } from './codeBlocks';
 import { CODE_SELECTORS, CodeBlock } from './types';
 
-export const searchForCodeBlockElementIsPartOf = (element: Element): HTMLElement | null => {
-  const codeBlockSelector = Object.values(CODE_SELECTORS).find((selector) => element.closest(selector.selector));
+const queryAllSelectorsSelector = Object.values(CODE_SELECTORS)
+  .map((selector) => selector.selector)
+  .join(', ');
 
-  if (codeBlockSelector) {
-    return element.closest(codeBlockSelector.selector);
+export const searchForCodeBlockElementIsPartOf = (element: Element): CodeBlock | null => {
+  const codeBlockElement = element.closest(queryAllSelectorsSelector) as HTMLElement | undefined;
+
+  if (codeBlockElement) {
+    const codeBlockId = getOrAddIdToCodeBlock(codeBlockElement);
+    return {
+      html: codeBlockElement,
+      codeBlockId,
+    };
   }
 
   return null;
 };
 
 export const findCodeBlocksOnPage = (document: Document): CodeBlock[] => {
-  const codeBlocks: CodeBlock[] = [];
+  const elements = document.querySelectorAll(queryAllSelectorsSelector);
 
-  Object.values(CODE_SELECTORS).forEach((selector) => {
-    const elements = document.querySelectorAll(selector.selector);
+  return Array.from(elements).map((element: Element) => {
+    const htmlElement = element as HTMLElement;
 
-    elements.forEach((element) => {
-      const htmlElement = element as HTMLElement;
+    const codeBlockId = getOrAddIdToCodeBlock(htmlElement);
 
-      const codeBlock: CodeBlock = {
-        html: htmlElement,
-      };
-
-      codeBlocks.push(codeBlock);
-    });
+    return {
+      html: htmlElement,
+      codeBlockId,
+    };
   });
-
-  return codeBlocks;
 };

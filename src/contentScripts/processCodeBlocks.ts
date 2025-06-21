@@ -1,9 +1,8 @@
 import {
-  addIdToCodeBlock,
   clearCodeBlockTimeoutIfExists,
+  CodeBlock,
   CodeBlockTrackingState,
   findCodeBlocksOnPage,
-  getIdFromCodeBlock,
   searchForCodeBlockElementIsPartOf,
   setCodeBlockTimeout,
   setupCodeBlockTracking,
@@ -31,9 +30,7 @@ const setup = () => {
   return { hoverHintState, codeBlockTrackingState, llmInterface };
 };
 
-async function processCodeBlock(state: HoverHintState, llmInterface: LlmInterface, element: Element) {
-  const codeBlock = { html: element as HTMLElement };
-
+async function processCodeBlock(state: HoverHintState, llmInterface: LlmInterface, codeBlock: CodeBlock) {
   const hoverHintList = await retrieveAnnotations(codeBlock, llmInterface);
   attachHoverHints(hoverHintList, state);
 }
@@ -42,8 +39,7 @@ const processAllCodeBlocksOnPageLoad = (hoverHintState: HoverHintState, llmInter
   const blocks = findCodeBlocksOnPage(document);
 
   blocks.forEach((codeBlock) => {
-    const htmlElement = codeBlock.html;
-    void processCodeBlock(hoverHintState, llmInterface, htmlElement);
+    void processCodeBlock(hoverHintState, llmInterface, codeBlock);
   });
 };
 
@@ -64,16 +60,13 @@ const setupMutationObserver = (
         return;
       }
 
-      let id = getIdFromCodeBlock(possibleCodeBlock);
-      if (!id) {
-        id = addIdToCodeBlock(possibleCodeBlock);
-      }
+      const { codeBlockId } = possibleCodeBlock;
 
-      clearCodeBlockTimeoutIfExists(codeBlockTrackingState, id);
+      clearCodeBlockTimeoutIfExists(codeBlockTrackingState, codeBlockId);
 
       setCodeBlockTimeout(
         codeBlockTrackingState,
-        id,
+        codeBlockId,
         () => {
           console.log('Code block processed');
           void processCodeBlock(hoverHintState, llmInterface, possibleCodeBlock);

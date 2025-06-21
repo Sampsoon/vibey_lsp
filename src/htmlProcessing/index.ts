@@ -9,8 +9,7 @@ export type {
 } from './types';
 
 export {
-  addIdToCodeBlock,
-  getIdFromCodeBlock,
+  getOrAddIdToCodeBlock,
   setupCodeBlockTracking,
   clearCodeBlockTimeoutIfExists,
   setCodeBlockTimeout,
