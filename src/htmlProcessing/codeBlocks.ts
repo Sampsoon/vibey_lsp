@@ -24,8 +24,10 @@ export const attachIdsToTokens = (code: CodeBlock) => {
   const codeTokens = getDomLeaves(html);
 
   codeTokens.forEach((token) => {
-    const id = generateTokenHashId(token, codeBlockId);
-    token.dataset[CODE_TOKEN_ID_NAME] = id;
+    if (!token.dataset[CODE_TOKEN_ID_NAME]) {
+      const id = generateTokenHashId(token, codeBlockId);
+      token.dataset[CODE_TOKEN_ID_NAME] = id;
+    }
   });
 };
 
