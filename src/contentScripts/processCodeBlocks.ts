@@ -18,6 +18,28 @@ import {
 
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_STABLE = 800;
 
+async function processCodeBlock(state: HoverHintState, llmInterface: LlmInterface, codeBlock: CodeBlock) {
+  const hoverHintList = await retrieveAnnotations(codeBlock, llmInterface);
+  attachHoverHints(hoverHintList, state);
+}
+
+const createCodeBlockProcessingObserver = (hoverHintState: HoverHintState, llmInterface: LlmInterface) => {
+  const intersectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const codeBlock = searchForCodeBlockElementIsPartOf(entry.target as HTMLElement);
+
+        if (codeBlock) {
+          intersectionObserver.unobserve(entry.target as HTMLElement);
+          void processCodeBlock(hoverHintState, llmInterface, codeBlock);
+        }
+      }
+    });
+  });
+
+  return intersectionObserver;
+};
+
 const setup = () => {
   const llmInterface = createHoverHintRetrievalLlmInterface();
 
@@ -27,26 +49,22 @@ const setup = () => {
 
   setupHoverHintTriggers(document, hoverHintState);
 
-  return { hoverHintState, codeBlockTrackingState, llmInterface };
+  const codeBlockProcessingObserver = createCodeBlockProcessingObserver(hoverHintState, llmInterface);
+
+  return { codeBlockTrackingState, codeBlockProcessingObserver };
 };
 
-async function processCodeBlock(state: HoverHintState, llmInterface: LlmInterface, codeBlock: CodeBlock) {
-  const hoverHintList = await retrieveAnnotations(codeBlock, llmInterface);
-  attachHoverHints(hoverHintList, state);
-}
-
-const processAllCodeBlocksOnPageLoad = (hoverHintState: HoverHintState, llmInterface: LlmInterface) => {
+const processCodeBlocksOnPage = (codeBlockProcessingObserver: IntersectionObserver) => {
   const blocks = findCodeBlocksOnPage(document);
 
   blocks.forEach((codeBlock) => {
-    void processCodeBlock(hoverHintState, llmInterface, codeBlock);
+    codeBlockProcessingObserver.observe(codeBlock.html);
   });
 };
 
 const setupMutationObserver = (
-  hoverHintState: HoverHintState,
   codeBlockTrackingState: CodeBlockTrackingState,
-  llmInterface: LlmInterface,
+  codeBlockProcessingObserver: IntersectionObserver,
 ) => {
   const mutationObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
@@ -68,8 +86,7 @@ const setupMutationObserver = (
         codeBlockTrackingState,
         codeBlockId,
         () => {
-          console.log('Code block processed');
-          void processCodeBlock(hoverHintState, llmInterface, possibleCodeBlock);
+          codeBlockProcessingObserver.observe(possibleCodeBlock.html);
         },
         MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_STABLE,
       );
@@ -85,10 +102,10 @@ const setupMutationObserver = (
   return mutationObserver;
 };
 
-const { hoverHintState, codeBlockTrackingState, llmInterface } = setup();
+const { codeBlockTrackingState, codeBlockProcessingObserver } = setup();
 
 window.addEventListener('load', () => {
-  processAllCodeBlocksOnPageLoad(hoverHintState, llmInterface);
+  processCodeBlocksOnPage(codeBlockProcessingObserver);
 });
 
-setupMutationObserver(hoverHintState, codeBlockTrackingState, llmInterface);
+setupMutationObserver(codeBlockTrackingState, codeBlockProcessingObserver);
