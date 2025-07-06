@@ -1,4 +1,10 @@
-import { CODE_BLOCK_ALREADY_PROCESSED, CodeBlock, CodeBlockStabilityTimer, CodeBlockTrackingState } from './types';
+import {
+  CODE_BLOCK_ALREADY_PROCESSED,
+  CodeBlock,
+  CodeBlockStabilityTimer,
+  CodeBlockTrackingState,
+  CodeBlockTrackingTable,
+} from './types';
 
 const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
 
@@ -51,16 +57,17 @@ export const getOrAddIdToCodeBlock = (element: HTMLElement): { id: string; isNew
 
 export const setupCodeBlockTracking = (): CodeBlockTrackingState => {
   return {
-    codeBlockLookupTable: new Map<string, CodeBlockStabilityTimer>(),
+    mutatedCodeBlocksLookupTable: new Map<string, CodeBlockStabilityTimer>(),
+    codeBlocksInViewLookupTable: new Map<string, CodeBlockStabilityTimer>(),
   };
 };
 
-export const clearCodeBlockTimeoutIfExists = (codeBlockTrackingState: CodeBlockTrackingState, id: string) => {
-  if (!codeBlockTrackingState.codeBlockLookupTable.has(id)) {
+export const clearCodeBlockTimeoutIfExists = (trackingTable: CodeBlockTrackingTable, id: string) => {
+  if (!trackingTable.has(id)) {
     return;
   }
 
-  const timeout = codeBlockTrackingState.codeBlockLookupTable.get(id);
+  const timeout = trackingTable.get(id);
 
   if (timeout === CODE_BLOCK_ALREADY_PROCESSED) {
     return;
@@ -70,15 +77,15 @@ export const clearCodeBlockTimeoutIfExists = (codeBlockTrackingState: CodeBlockT
 };
 
 export const setCodeBlockTimeout = (
-  codeBlockTrackingState: CodeBlockTrackingState,
+  trackingTable: CodeBlockTrackingTable,
   id: string,
   callback: () => void,
   timeout: number,
 ) => {
   const timeoutId = window.setTimeout(() => {
     callback();
-    codeBlockTrackingState.codeBlockLookupTable.set(id, CODE_BLOCK_ALREADY_PROCESSED);
+    trackingTable.set(id, CODE_BLOCK_ALREADY_PROCESSED);
   }, timeout);
 
-  codeBlockTrackingState.codeBlockLookupTable.set(id, timeoutId);
+  trackingTable.set(id, timeoutId);
 };

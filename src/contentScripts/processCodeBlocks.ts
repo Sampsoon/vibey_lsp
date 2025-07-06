@@ -17,30 +17,48 @@ import {
   HoverHintState,
 } from '../hoverHints';
 
-const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_STABLE = 800;
+const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_MUTATIONS_STABLE = 800;
+const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE = 1000;
 
 async function processCodeBlock(state: HoverHintState, llmInterface: LlmInterface, codeBlock: CodeBlock) {
+  console.log('Processing code block');
   const hoverHintList = await retrieveAnnotations(codeBlock, llmInterface);
   attachHoverHints(hoverHintList, state);
 }
 
-const createCodeBlockProcessingObserver = (hoverHintState: HoverHintState, llmInterface: LlmInterface) => {
+const createCodeBlockProcessingObserver = (
+  hoverHintState: HoverHintState,
+  codeBlockTrackingState: CodeBlockTrackingState,
+  llmInterface: LlmInterface,
+) => {
   const intersectionObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const codeBlock = searchForCodeBlockElementIsPartOf(entry.target as HTMLElement);
+        const codeBlock = searchForCodeBlockElementIsPartOf(entry.target as HTMLElement);
 
-          if (codeBlock) {
-            intersectionObserver.unobserve(entry.target as HTMLElement);
-            console.log('Processing code block');
-            void processCodeBlock(hoverHintState, llmInterface, codeBlock);
-          }
+        if (!codeBlock) {
+          return;
+        }
+
+        const { codeBlockId } = codeBlock;
+
+        clearCodeBlockTimeoutIfExists(codeBlockTrackingState.codeBlocksInViewLookupTable, codeBlockId);
+
+        if (entry.isIntersecting) {
+          setCodeBlockTimeout(
+            codeBlockTrackingState.codeBlocksInViewLookupTable,
+            codeBlockId,
+            () => {
+              intersectionObserver.unobserve(entry.target as HTMLElement);
+              void processCodeBlock(hoverHintState, llmInterface, codeBlock);
+            },
+            MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE,
+          );
         }
       });
     },
     {
-      rootMargin: '50%',
+      rootMargin: '25%',
     },
   );
 
@@ -56,7 +74,11 @@ const setup = () => {
 
   setupHoverHintTriggers(document, hoverHintState);
 
-  const codeBlockProcessingObserver = createCodeBlockProcessingObserver(hoverHintState, llmInterface);
+  const codeBlockProcessingObserver = createCodeBlockProcessingObserver(
+    hoverHintState,
+    codeBlockTrackingState,
+    llmInterface,
+  );
 
   return { codeBlockTrackingState, codeBlockProcessingObserver };
 };
@@ -83,15 +105,15 @@ const setupMutationObserver = (
 
       const { codeBlockId } = codeBlock;
 
-      clearCodeBlockTimeoutIfExists(codeBlockTrackingState, codeBlockId);
+      clearCodeBlockTimeoutIfExists(codeBlockTrackingState.mutatedCodeBlocksLookupTable, codeBlockId);
 
       setCodeBlockTimeout(
-        codeBlockTrackingState,
+        codeBlockTrackingState.mutatedCodeBlocksLookupTable,
         codeBlockId,
         () => {
           codeBlockProcessingObserver.observe(codeBlock.html);
         },
-        MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_STABLE,
+        MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_MUTATIONS_STABLE,
       );
     });
   });

@@ -58,4 +58,3 @@ class W;ordCounter:
 wc = WordCounter('example.txt')
 print(wc.count_words())
 ```
-* await until view is stable before processing code block in view

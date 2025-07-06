@@ -6,6 +6,7 @@ export type {
   CodeBlockAlreadyProcessed,
   CodeBlockStabilityTimer,
   CodeBlockTrackingState,
+  CodeBlockTrackingTable,
 } from './types';
 
 export {

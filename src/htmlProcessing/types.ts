@@ -24,6 +24,9 @@ export type CodeBlockAlreadyProcessed = typeof CODE_BLOCK_ALREADY_PROCESSED;
 
 export type CodeBlockStabilityTimer = number | CodeBlockAlreadyProcessed;
 
+export type CodeBlockTrackingTable = Map<string, CodeBlockStabilityTimer>;
+
 export interface CodeBlockTrackingState {
-  codeBlockLookupTable: Map<string, CodeBlockStabilityTimer>;
+  mutatedCodeBlocksLookupTable: CodeBlockTrackingTable;
+  codeBlocksInViewLookupTable: CodeBlockTrackingTable;
 }
