@@ -128,6 +128,8 @@ const setupMutationObserver = (
       const { codeBlockId } = codeBlock;
 
       clearCodeBlockTimeoutIfExists(codeBlockTrackingState.mutatedCodeBlocksLookupTable, codeBlockId);
+      clearCodeBlockTimeoutIfExists(codeBlockTrackingState.codeBlocksInViewLookupTable, codeBlockId);
+      codeBlockProcessingObserver.unobserve(codeBlock.html);
 
       setCodeBlockTimeout(
         codeBlockTrackingState.mutatedCodeBlocksLookupTable,
