@@ -4,10 +4,10 @@ import {
   CodeBlockTrackingState,
   findCodeBlocksOnPage,
   findCodeBlockPartOfMutation,
-  searchForCodeBlockElementIsPartOf,
   setCodeBlockTimeout,
   setupCodeBlockTracking,
   isCodeBlockInView,
+  getOrAddIdToCodeBlock,
 } from '../htmlProcessing';
 import { LlmInterface, createHoverHintRetrievalLlmInterface } from '../llm';
 import {
@@ -52,13 +52,8 @@ const createCodeBlockProcessingObserver = (
   const intersectionObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        const codeBlock = searchForCodeBlockElementIsPartOf(entry.target as HTMLElement);
-
-        if (!codeBlock) {
-          return;
-        }
-
-        const { codeBlockId } = codeBlock;
+        const html = entry.target as HTMLElement;
+        const { id: codeBlockId } = getOrAddIdToCodeBlock(html);
 
         clearCodeBlockTimeoutIfExists(codeBlockTrackingState.codeBlocksInViewLookupTable, codeBlockId);
 
@@ -68,6 +63,12 @@ const createCodeBlockProcessingObserver = (
             codeBlockId,
             () => {
               intersectionObserver.unobserve(entry.target as HTMLElement);
+
+              const codeBlock = {
+                html,
+                codeBlockId,
+              };
+
               void generateHoverhintsForCodeBlock(hoverHintState, llmInterface, codeBlock);
             },
             MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE,

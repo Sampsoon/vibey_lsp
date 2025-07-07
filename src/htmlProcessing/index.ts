@@ -19,4 +19,4 @@ export {
   isCodeBlockInView,
 } from './codeBlocks';
 
-export { searchForCodeBlockElementIsPartOf, findCodeBlockPartOfMutation, findCodeBlocksOnPage } from './parsing';
+export { findCodeBlockPartOfMutation, findCodeBlocksOnPage } from './parsing';

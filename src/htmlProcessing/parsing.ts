@@ -11,7 +11,7 @@ const isMultiLineCodeBlock = (element: Element): boolean => {
 
 const isValidCodeBlockElement = (element: Element): boolean => isMultiLineCodeBlock(element);
 
-export const searchForCodeBlockElementIsPartOf = (element: Element): CodeBlock | null => {
+const searchForCodeBlockElementIsPartOf = (element: Element): CodeBlock | null => {
   const codeBlockElement = element.closest(queryAllSelectorsSelector) as HTMLElement | undefined;
 
   if (codeBlockElement) {
