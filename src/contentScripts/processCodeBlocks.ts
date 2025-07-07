@@ -24,11 +24,25 @@ const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE = 1000;
 const SMALLEST_SCREEN_DIMENSION = Math.min(window.innerWidth, window.innerHeight);
 const ROOT_MARGIN_PERCENTAGE = 0.25;
 
-async function processCodeBlock(state: HoverHintState, llmInterface: LlmInterface, codeBlock: CodeBlock) {
+async function generateHoverhintsForCodeBlock(state: HoverHintState, llmInterface: LlmInterface, codeBlock: CodeBlock) {
   console.log('Processing code block');
   const hoverHintList = await retrieveAnnotations(codeBlock, llmInterface);
   attachHoverHints(hoverHintList, state);
 }
+
+const processCodeBlock = (
+  codeBlock: CodeBlock,
+  hoverHintState: HoverHintState,
+  llmInterface: LlmInterface,
+  codeBlockProcessingObserver: IntersectionObserver,
+) => {
+  // We process code blocks that are in view on page load so that there is no delay in showing hover hints
+  if (isCodeBlockInView(codeBlock)) {
+    void generateHoverhintsForCodeBlock(hoverHintState, llmInterface, codeBlock);
+  } else {
+    codeBlockProcessingObserver.observe(codeBlock.html);
+  }
+};
 
 const createCodeBlockProcessingObserver = (
   hoverHintState: HoverHintState,
@@ -54,7 +68,7 @@ const createCodeBlockProcessingObserver = (
             codeBlockId,
             () => {
               intersectionObserver.unobserve(entry.target as HTMLElement);
-              void processCodeBlock(hoverHintState, llmInterface, codeBlock);
+              void generateHoverhintsForCodeBlock(hoverHintState, llmInterface, codeBlock);
             },
             MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE,
           );
@@ -94,12 +108,7 @@ const processCodeBlocksOnPage = (
 ) => {
   const blocks = findCodeBlocksOnPage(document);
   blocks.forEach((codeBlock) => {
-    // We process code blocks that are in view on page load so that there is no delay in showing hover hints
-    if (isCodeBlockInView(codeBlock)) {
-      void processCodeBlock(hoverHintState, llmInterface, codeBlock);
-    } else {
-      codeBlockProcessingObserver.observe(codeBlock.html);
-    }
+    processCodeBlock(codeBlock, hoverHintState, llmInterface, codeBlockProcessingObserver);
   });
 };
 
@@ -123,7 +132,7 @@ const setupMutationObserver = (
         codeBlockTrackingState.mutatedCodeBlocksLookupTable,
         codeBlockId,
         () => {
-          codeBlockProcessingObserver.observe(codeBlock.html);
+          processCodeBlock(codeBlock, hoverHintState, llmInterface, codeBlockProcessingObserver);
         },
         MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_MUTATIONS_STABLE,
       );
