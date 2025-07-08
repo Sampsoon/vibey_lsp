@@ -58,3 +58,6 @@ class W;ordCounter:
 wc = WordCounter('example.txt')
 print(wc.count_words())
 ```
+
+## Remember
+* Turn off dangerouslyAllowBrowser before launch
