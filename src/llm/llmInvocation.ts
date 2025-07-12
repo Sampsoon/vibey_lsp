@@ -15,8 +15,8 @@ const invokeOpenAiClient = async (client: OpenAI, params: ChatCompletionCreatePa
   return rawContent;
 };
 
-export const createOpenAiClientStructuredOutputInterface = (client: OpenAI, model: string) => {
-  return async <T>(prompt: string, schema: z.ZodSchema<T>) => {
+export const createOpenAiClientInterface = (client: OpenAI, model: string) => {
+  return async <ReturnType>(prompt: string, schema?: z.ZodSchema<ReturnType>) => {
     const params: ChatCompletionCreateParams = {
       model,
       messages: [
@@ -32,17 +32,22 @@ export const createOpenAiClientStructuredOutputInterface = (client: OpenAI, mode
       ],
     };
 
-    const jsonSchema = zodToJsonSchema(schema);
+    if (schema) {
+      const jsonSchema = zodToJsonSchema(schema);
 
-    params.response_format = {
-      type: 'json_schema',
-      json_schema: {
-        name: 'extracted_json_data',
-        schema: jsonSchema,
-      },
-    };
+      params.response_format = {
+        type: 'json_schema',
+        json_schema: {
+          name: 'extracted_json_data',
+          schema: jsonSchema,
+        },
+      };
+
+      const rawContent = await invokeOpenAiClient(client, params);
+      return schema.parse(JSON.parse(rawContent));
+    }
 
     const rawContent = await invokeOpenAiClient(client, params);
-    return schema.parse(JSON.parse(rawContent));
+    return rawContent as ReturnType;
   };
 };
