@@ -13,22 +13,17 @@ const geminiClient = new OpenAI({
   dangerouslyAllowBrowser: true,
 });
 
-export const STRUCTURED_OUTPUT_LLM_CALLS = {
-  GPT_4_1_STRUCTURED_OUTPUT: 'GPT_4_1_STRUCTURED_OUTPUT',
-  GEMINI_2_5_FLASH_STRUCTURED_OUTPUT: 'GEMINI_2_5_FLASH_STRUCTURED_OUTPUT',
-} as const;
+export const enum STRUCTURED_OUTPUT_LLM_CALLS {
+  GPT_4_1 = 'GPT_4_1_STRUCTURED_OUTPUT',
+  GEMINI_2_5_FLASH = 'GEMINI_2_5_FLASH_STRUCTURED_OUTPUT',
+}
 
-type CallLLM = Record<
-  (typeof STRUCTURED_OUTPUT_LLM_CALLS)[keyof typeof STRUCTURED_OUTPUT_LLM_CALLS],
-  ReturnType<typeof createOpenAiClientStructuredOutputInterface>
->;
-
-export const callLLM: CallLLM = {
-  [STRUCTURED_OUTPUT_LLM_CALLS.GPT_4_1_STRUCTURED_OUTPUT]: createOpenAiClientStructuredOutputInterface(
+export const callLLM = {
+  [STRUCTURED_OUTPUT_LLM_CALLS.GPT_4_1]: createOpenAiClientStructuredOutputInterface(
     openAiClient,
     'gpt-4.1-2025-04-14',
   ),
-  [STRUCTURED_OUTPUT_LLM_CALLS.GEMINI_2_5_FLASH_STRUCTURED_OUTPUT]: createOpenAiClientStructuredOutputInterface(
+  [STRUCTURED_OUTPUT_LLM_CALLS.GEMINI_2_5_FLASH]: createOpenAiClientStructuredOutputInterface(
     geminiClient,
     'gemini-2.5-flash',
   ),

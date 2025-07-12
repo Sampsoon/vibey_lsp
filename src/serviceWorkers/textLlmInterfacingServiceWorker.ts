@@ -1,11 +1,9 @@
-import { STRUCTURED_OUTPUT_LLM_CALLS } from '../llm';
+import { callLLM } from '../llm';
 import { ServiceWorkerMessage, ServiceWorkerMessageType } from './interface';
-
-export type StructuredOutputLlmCalls = (typeof STRUCTURED_OUTPUT_LLM_CALLS)[keyof typeof STRUCTURED_OUTPUT_LLM_CALLS];
 
 export interface TextLlmInterfacingPayload {
   prompt: string;
-  llmCall: StructuredOutputLlmCalls;
+  llmCall: keyof typeof callLLM;
   schema: Record<string, unknown>;
 }
 
