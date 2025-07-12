@@ -1,7 +1,6 @@
 import { HoverHintList } from '../../hoverHints';
 import { CodeBlock } from '../../htmlProcessing';
-import { HoverHintRetrievalMessage } from '../hoverHintRetrievalServiceWorker';
-import { ServiceWorkerMessage, ServiceWorkerMessageType } from './types';
+import { ServiceWorkerMessage, ServiceWorkerMessageType, HoverHintRetrievalMessage } from './types';
 
 const invokeServiceWorker = async <ReturnType>(message: ServiceWorkerMessage<unknown>): Promise<ReturnType> => {
   try {

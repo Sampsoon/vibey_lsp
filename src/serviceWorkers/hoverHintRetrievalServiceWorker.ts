@@ -1,22 +1,7 @@
 import { hoverHintListSchema, HoverHintList } from '../hoverHints';
 import { callLLM } from '../llm';
 import { RETRIEVAL_HOVER_HINTS_PROMPT } from './hoverHintRetrieval';
-import { ServiceWorkerMessage, ServiceWorkerMessageType } from './interface';
-
-export interface HoverHintRetrievalPayload {
-  codeBlockRawHtml: string;
-}
-
-export interface HoverHintRetrievalMessage extends ServiceWorkerMessage<HoverHintRetrievalPayload> {
-  type: ServiceWorkerMessageType.HOVER_HINT_RETRIEVAL;
-  payload: HoverHintRetrievalPayload;
-}
-
-const isHoverHintRetrievalMessage = (message: ServiceWorkerMessage<unknown>): message is HoverHintRetrievalMessage => {
-  // TODO: Delete eslint rule once more message types are added
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  return message.type === ServiceWorkerMessageType.HOVER_HINT_RETRIEVAL;
-};
+import { isHoverHintRetrievalMessage, ServiceWorkerMessage } from './interface';
 
 const retrieveHoverHints = async (codeBlockRawHtml: string): Promise<HoverHintList> => {
   const MAX_RETRIES = 5;
