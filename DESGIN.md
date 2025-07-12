@@ -62,5 +62,3 @@ print(wc.count_words())
 
 * Scrub inputs to service workers
 
-## Remember
-* Remove logic for LLMs that are not being used
