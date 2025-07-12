@@ -4,13 +4,11 @@ import { createOpenAiClientStructuredOutputInterface } from './llmInvocation';
 
 const openAiClient = new OpenAI({
   apiKey: API_KEYS.OPENAI,
-  dangerouslyAllowBrowser: true,
 });
 
 const geminiClient = new OpenAI({
   apiKey: API_KEYS.GEMINI,
   baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
-  dangerouslyAllowBrowser: true,
 });
 
 export const enum STRUCTURED_OUTPUT_LLM_CALLS {
