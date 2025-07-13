@@ -1,9 +1,14 @@
-import { hoverHintListSchema, HoverHintList } from '../hoverHints';
+import { HoverHint, hoverHintListSchema } from '../hoverHints';
 import { callLLM } from '../llm';
+import { createHoverHintStreamError, createHoverHintStreamMessage } from '../stream';
 import { RETRIEVAL_HOVER_HINTS_PROMPT } from './hoverHintRetrieval';
 import { isHoverHintRetrievalMessage, ServiceWorkerMessage } from './interface';
 
-const retrieveHoverHints = async (codeBlockRawHtml: string): Promise<HoverHintList> => {
+const retrieveHoverHintsStream = async (
+  codeBlockRawHtml: string,
+  onHoverHint: (hoverHint: HoverHint) => void,
+  onError: (errorMessage: string) => void,
+) => {
   const MAX_RETRIES = 5;
   const RETRY_DELAY = 1000;
 
@@ -14,7 +19,11 @@ const retrieveHoverHints = async (codeBlockRawHtml: string): Promise<HoverHintLi
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
       const hoverHintList = await callLLM.OPEN_ROUTER(prompt, hoverHintListSchema);
-      return hoverHintList;
+
+      hoverHintList.hoverHintList.forEach((hoverHint) => {
+        onHoverHint(hoverHint);
+      });
+      return;
     } catch (error) {
       console.error('Error retrieving annotations', error);
       await new Promise((resolve) => setTimeout(resolve, currentRetryDelay));
@@ -22,23 +31,30 @@ const retrieveHoverHints = async (codeBlockRawHtml: string): Promise<HoverHintLi
     }
   }
 
-  throw new Error('Failed to retrieve annotations after 5 retries');
+  onError('Failed to retrieve annotations after 5 retries');
 };
 
-chrome.runtime.onMessage.addListener((message: ServiceWorkerMessage<unknown>, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message: ServiceWorkerMessage<unknown>, sender) => {
   if (!isHoverHintRetrievalMessage(message)) {
     return;
   }
 
-  retrieveHoverHints(message.payload.codeBlockRawHtml)
-    .then((hoverHintList) => {
-      sendResponse(hoverHintList);
-    })
-    .catch((error: unknown) => {
-      console.error('Error in hover hint retrieval:', error);
-      sendResponse({ hoverHintList: [] });
-    });
+  const tabId = sender.tab?.id;
 
-  // Return true to indicate that we will send a response asynchronously
+  if (!tabId) {
+    console.error('No tab id found');
+    return;
+  }
+
+  void retrieveHoverHintsStream(
+    message.payload.codeBlockRawHtml,
+    (hoverHint) => {
+      void chrome.tabs.sendMessage(tabId, createHoverHintStreamMessage(hoverHint));
+    },
+    (errorMessage) => {
+      void chrome.tabs.sendMessage(tabId, createHoverHintStreamError(errorMessage));
+    },
+  );
+
   return true;
 });

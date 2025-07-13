@@ -10,8 +10,11 @@ import {
   getOrAddIdToCodeBlock,
   attachIdsToTokens,
 } from '../htmlProcessing';
-import { attachHoverHints, setupHoverHintState, setupHoverHintTriggers, HoverHintState } from '../hoverHints';
-import { invokeHoverHintRetrievalServiceWorker } from '../serviceWorkers/interface';
+import { attachHoverHint, setupHoverHintState, setupHoverHintTriggers } from '../hoverHints';
+import {
+  invokeHoverHintRetrievalServiceWorker,
+  listenForHoverHintsFromServiceWorker,
+} from '../serviceWorkers/interface';
 
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_MUTATIONS_STABLE = 800;
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE = 1000;
@@ -19,35 +22,22 @@ const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE = 1000;
 const SMALLEST_SCREEN_DIMENSION = Math.min(window.innerWidth, window.innerHeight);
 const ROOT_MARGIN_PERCENTAGE = 0.25;
 
-async function generateHoverhintsForCodeBlock(state: HoverHintState, codeBlock: CodeBlock) {
-  const time = performance.now();
+function generateHoverhintsForCodeBlock(codeBlock: CodeBlock) {
   console.log('Retrieving annotations for code block:', codeBlock.codeBlockId);
-
   attachIdsToTokens(codeBlock);
-  const hoverHintList = await invokeHoverHintRetrievalServiceWorker(codeBlock);
-  attachHoverHints(hoverHintList, state);
-
-  const timeTaken = (performance.now() - time) / 1000;
-  console.log('Time taken to retrieve annotations:', timeTaken, 'seconds');
+  void invokeHoverHintRetrievalServiceWorker(codeBlock);
 }
 
-const processCodeBlock = (
-  codeBlock: CodeBlock,
-  hoverHintState: HoverHintState,
-  codeBlockProcessingObserver: IntersectionObserver,
-) => {
+const processCodeBlock = (codeBlock: CodeBlock, codeBlockProcessingObserver: IntersectionObserver) => {
   // We process code blocks that are in view on page load so that there is no delay in showing hover hints
   if (isCodeBlockInView(codeBlock)) {
-    void generateHoverhintsForCodeBlock(hoverHintState, codeBlock);
+    generateHoverhintsForCodeBlock(codeBlock);
   } else {
     codeBlockProcessingObserver.observe(codeBlock.html);
   }
 };
 
-const createCodeBlockProcessingObserver = (
-  hoverHintState: HoverHintState,
-  codeBlockTrackingState: CodeBlockTrackingState,
-) => {
+const createCodeBlockProcessingObserver = (codeBlockTrackingState: CodeBlockTrackingState) => {
   const intersectionObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -68,7 +58,7 @@ const createCodeBlockProcessingObserver = (
                 codeBlockId,
               };
 
-              void generateHoverhintsForCodeBlock(hoverHintState, codeBlock);
+              generateHoverhintsForCodeBlock(codeBlock);
             },
             MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE,
           );
@@ -90,15 +80,15 @@ const setup = () => {
 
   setupHoverHintTriggers(document, hoverHintState);
 
-  const codeBlockProcessingObserver = createCodeBlockProcessingObserver(hoverHintState, codeBlockTrackingState);
+  const codeBlockProcessingObserver = createCodeBlockProcessingObserver(codeBlockTrackingState);
 
   return { codeBlockTrackingState, codeBlockProcessingObserver, hoverHintState };
 };
 
-const processCodeBlocksOnPage = (hoverHintState: HoverHintState, codeBlockProcessingObserver: IntersectionObserver) => {
+const processCodeBlocksOnPage = (codeBlockProcessingObserver: IntersectionObserver) => {
   const blocks = findCodeBlocksOnPage(document);
   blocks.forEach((codeBlock) => {
-    processCodeBlock(codeBlock, hoverHintState, codeBlockProcessingObserver);
+    processCodeBlock(codeBlock, codeBlockProcessingObserver);
   });
 };
 
@@ -124,7 +114,7 @@ const setupMutationObserver = (
         codeBlockTrackingState.mutatedCodeBlocksLookupTable,
         codeBlockId,
         () => {
-          processCodeBlock(codeBlock, hoverHintState, codeBlockProcessingObserver);
+          processCodeBlock(codeBlock, codeBlockProcessingObserver);
         },
         MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_MUTATIONS_STABLE,
       );
@@ -142,8 +132,12 @@ const setupMutationObserver = (
 
 const { codeBlockTrackingState, codeBlockProcessingObserver, hoverHintState } = setup();
 
+listenForHoverHintsFromServiceWorker((hoverHint) => {
+  attachHoverHint(hoverHint, hoverHintState);
+});
+
 window.addEventListener('load', () => {
-  processCodeBlocksOnPage(hoverHintState, codeBlockProcessingObserver);
+  processCodeBlocksOnPage(codeBlockProcessingObserver);
 });
 
 setupMutationObserver(codeBlockTrackingState, codeBlockProcessingObserver);

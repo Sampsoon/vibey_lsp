@@ -1,17 +1,9 @@
-import { HoverHintList } from '../../hoverHints';
+import { HoverHint } from '../../hoverHints';
 import { CodeBlock } from '../../htmlProcessing';
-import { ServiceWorkerMessage, ServiceWorkerMessageType, HoverHintRetrievalMessage } from './types';
+import { isHoverHintStreamError, isHoverHintStreamMessage } from '../../stream';
+import { ServiceWorkerMessageType, HoverHintRetrievalMessage } from './types';
 
-const invokeServiceWorker = async <ReturnType>(message: ServiceWorkerMessage<unknown>): Promise<ReturnType> => {
-  try {
-    const response = (await chrome.runtime.sendMessage(message)) as ReturnType;
-    return response;
-  } catch (error) {
-    throw new Error(`Service worker invocation failed: ${error instanceof Error ? error.message : String(error)}`);
-  }
-};
-
-export const invokeHoverHintRetrievalServiceWorker = async (codeBlock: CodeBlock): Promise<HoverHintList> => {
+export const invokeHoverHintRetrievalServiceWorker = async (codeBlock: CodeBlock) => {
   const message: HoverHintRetrievalMessage = {
     type: ServiceWorkerMessageType.HOVER_HINT_RETRIEVAL,
     payload: {
@@ -19,6 +11,20 @@ export const invokeHoverHintRetrievalServiceWorker = async (codeBlock: CodeBlock
     },
   };
 
-  const response = await invokeServiceWorker<HoverHintList>(message);
-  return response;
+  await chrome.runtime.sendMessage(message);
+};
+
+export const listenForHoverHintsFromServiceWorker = (processHoverHint: (hoverHint: HoverHint) => void) => {
+  const messageListener = (msg: unknown) => {
+    if (isHoverHintStreamMessage(msg)) {
+      processHoverHint(msg.hoverHint);
+      return;
+    }
+
+    if (isHoverHintStreamError(msg)) {
+      console.error(msg.errorMessage);
+    }
+  };
+
+  chrome.runtime.onMessage.addListener(messageListener);
 };
