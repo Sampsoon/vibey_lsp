@@ -44,3 +44,4 @@ The following design is for a Chrome extension that will identify code blocks in
 * Pick a good LLM
 * Stream json response rather then wait for the whole thing
 * Scrub inputs to service workers
+* Add effect to code tokens that have definitions
