@@ -1,5 +1,5 @@
-export const RETRIEVAL_HOVER_HINTS_PROMPT = (codeBlockRawHtml: string) => `
-Analyze the HTML code block and return hover hints for code elements.
+export const RETRIEVAL_HOVER_HINTS_PROMPT = `
+Analyze the HTML code blocks provided to you as input and return hover hints for code elements.
 
 Return a JSON object with a "hoverHintList" array. Each item must have:
 - "data--element-ids": array of span data--element-id values that share the same documentation
@@ -51,7 +51,4 @@ Output:
     }
   ]
 }
-
-Now analyze this HTML code block:
-${codeBlockRawHtml}
 `;

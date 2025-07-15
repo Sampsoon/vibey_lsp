@@ -3,6 +3,11 @@ import * as z from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { ChatCompletionCreateParams, ChatCompletionCreateParamsNonStreaming } from 'openai/resources.mjs';
 
+export interface LlmParams<ReturnType> {
+  prompt?: string;
+  schema?: z.ZodSchema<ReturnType>;
+}
+
 const invokeOpenAiClient = async (client: OpenAI, params: ChatCompletionCreateParamsNonStreaming) => {
   const response = await client.chat.completions.create(params);
 
@@ -16,7 +21,7 @@ const invokeOpenAiClient = async (client: OpenAI, params: ChatCompletionCreatePa
 };
 
 export const createOpenAiClientInterface = (client: OpenAI, model: string) => {
-  return async <ReturnType>(prompt: string, schema?: z.ZodSchema<ReturnType>) => {
+  return async <ReturnType>(input: string, llmParams: LlmParams<ReturnType>) => {
     const params: ChatCompletionCreateParams = {
       model,
       messages: [
@@ -25,12 +30,21 @@ export const createOpenAiClientInterface = (client: OpenAI, model: string) => {
           content: [
             {
               type: 'text',
-              text: prompt,
+              text: input,
             },
           ],
         },
       ],
     };
+
+    const { prompt, schema } = llmParams;
+
+    if (prompt) {
+      params.messages.push({
+        role: 'system',
+        content: prompt,
+      });
+    }
 
     if (schema) {
       const jsonSchema = zodToJsonSchema(schema);

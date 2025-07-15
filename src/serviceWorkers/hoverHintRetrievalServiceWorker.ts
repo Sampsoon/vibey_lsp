@@ -1,5 +1,6 @@
-import { HoverHint, hoverHintListSchema } from '../hoverHints';
+import { HoverHint, HoverHintList, hoverHintListSchema } from '../hoverHints';
 import { callLLM } from '../llm';
+import { LlmParams } from '../llm/llmInvocation';
 import { createHoverHintStreamError, createHoverHintStreamMessage } from '../stream';
 import { RETRIEVAL_HOVER_HINTS_PROMPT } from './hoverHintRetrieval';
 import { isHoverHintRetrievalMessage, ServiceWorkerMessage } from './interface';
@@ -12,13 +13,16 @@ const retrieveHoverHintsStream = async (
   const MAX_RETRIES = 5;
   const RETRY_DELAY = 1000;
 
-  const prompt = RETRIEVAL_HOVER_HINTS_PROMPT(codeBlockRawHtml);
+  const llmParams: LlmParams<HoverHintList> = {
+    prompt: RETRIEVAL_HOVER_HINTS_PROMPT,
+    schema: hoverHintListSchema,
+  };
 
   let currentRetryDelay = RETRY_DELAY;
 
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
-      const hoverHintList = await callLLM.OPEN_ROUTER(prompt, hoverHintListSchema);
+      const hoverHintList = await callLLM.OPEN_ROUTER(codeBlockRawHtml, llmParams);
 
       hoverHintList.hoverHintList.forEach((hoverHint) => {
         onHoverHint(hoverHint);
