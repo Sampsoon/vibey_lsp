@@ -45,3 +45,6 @@ The following design is for a Chrome extension that will identify code blocks in
 * Stream json response rather then wait for the whole thing
 * Scrub inputs to service workers
 * Add effect to code tokens that have definitions
+
+### Bugs
+* Figure out why extension does not always fire for code blocks
