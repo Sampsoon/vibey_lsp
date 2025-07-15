@@ -1,7 +1,5 @@
-import { HoverHint, hoverHintListSchema } from '../hoverHints';
-import { hoverHintSchema } from '../hoverHints/types';
-import { callLLM } from '../llm';
-import { LlmParams } from '../llm/llmInvocation';
+import { HoverHint, hoverHintListSchema, hoverHintSchema } from '../hoverHints';
+import { callLLM, LlmParams } from '../llm';
 import { createHoverHintStreamError, createHoverHintStreamMessage, parseListOfObjectsFromStream } from '../stream';
 import { RETRIEVAL_HOVER_HINTS_PROMPT } from './hoverHintRetrieval';
 import { isHoverHintRetrievalMessage, ServiceWorkerMessage } from './interface';

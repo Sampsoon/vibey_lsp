@@ -11,10 +11,7 @@ import {
   attachIdsToTokens,
 } from '../htmlProcessing';
 import { attachHoverHint, setupHoverHintState, setupHoverHintTriggers } from '../hoverHints';
-import {
-  invokeHoverHintRetrievalServiceWorker,
-  listenForHoverHintsFromServiceWorker,
-} from '../serviceWorkers/interface';
+import { invokeHoverHintRetrievalServiceWorker, listenForHoverHintsFromServiceWorker } from '../serviceWorkers';
 
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_MUTATIONS_STABLE = 800;
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE = 1000;
