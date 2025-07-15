@@ -12,12 +12,9 @@ export const parseListOfObjectsFromStream = <ListElement>(
 
   return (chunk: string) => {
     for (const char of chunk) {
-      if (isInList && char === '{') {
-        bracketDepth++;
-      }
-
-      if (isInList && char === '}') {
-        bracketDepth--;
+      if (!isInList && char === '[') {
+        isInList = true;
+        continue;
       }
 
       if (isInList && char === ',' && bracketDepth === 0) {
@@ -26,14 +23,19 @@ export const parseListOfObjectsFromStream = <ListElement>(
 
         onElement(element);
         currentChunk = [];
+        continue;
       }
 
-      if (isInList && !(char === ',' && bracketDepth === 0)) {
+      if (isInList) {
         currentChunk.push(char);
       }
 
-      if (char === '[') {
-        isInList = true;
+      if (isInList && char === '{') {
+        bracketDepth++;
+      }
+
+      if (isInList && char === '}') {
+        bracketDepth--;
       }
     }
   };
