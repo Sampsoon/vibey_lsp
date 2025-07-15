@@ -80,9 +80,13 @@ const setup = () => {
 
   setupHoverHintTriggers(document, hoverHintState);
 
+  listenForHoverHintsFromServiceWorker((hoverHint) => {
+    attachHoverHint(hoverHint, hoverHintState);
+  });
+
   const codeBlockProcessingObserver = createCodeBlockProcessingObserver(codeBlockTrackingState);
 
-  return { codeBlockTrackingState, codeBlockProcessingObserver, hoverHintState };
+  return { codeBlockTrackingState, codeBlockProcessingObserver };
 };
 
 const processCodeBlocksOnPage = (codeBlockProcessingObserver: IntersectionObserver) => {
@@ -130,11 +134,7 @@ const setupMutationObserver = (
   return mutationObserver;
 };
 
-const { codeBlockTrackingState, codeBlockProcessingObserver, hoverHintState } = setup();
-
-listenForHoverHintsFromServiceWorker((hoverHint) => {
-  attachHoverHint(hoverHint, hoverHintState);
-});
+const { codeBlockTrackingState, codeBlockProcessingObserver } = setup();
 
 window.addEventListener('load', () => {
   processCodeBlocksOnPage(codeBlockProcessingObserver);
