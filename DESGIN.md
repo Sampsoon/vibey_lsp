@@ -48,3 +48,6 @@ The following design is for a Chrome extension that will identify code blocks in
 
 ### Bugs
 * Figure out why extension does not always fire for code blocks
+
+### House Keeping
+* Clean up `processCodeBlocks.ts`
