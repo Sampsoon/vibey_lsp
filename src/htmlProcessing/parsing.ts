@@ -5,11 +5,11 @@ const queryAllSelectorsSelector = Object.values(CODE_SELECTORS)
   .map((selector) => selector.selector)
   .join(', ');
 
-const isMultiLineCodeBlock = (element: Element): boolean => {
-  return element.children.length > 0;
+const codeBlockContainsSpans = (element: Element): boolean => {
+  return element.querySelectorAll('span').length > 0;
 };
 
-const isValidCodeBlockElement = (element: Element): boolean => isMultiLineCodeBlock(element);
+const isValidCodeBlockElement = (element: Element): boolean => codeBlockContainsSpans(element);
 
 const searchForCodeBlockElementIsPartOf = (element: Element): CodeBlock | null => {
   const codeBlockElement = element.closest(queryAllSelectorsSelector) as HTMLElement | undefined;
