@@ -1,16 +1,23 @@
 import { OpenAI } from 'openai';
 import * as z from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
-import { ChatCompletionCreateParams, ChatCompletionCreateParamsNonStreaming } from 'openai/resources.mjs';
+import { ChatCompletionCreateParams } from 'openai/resources.mjs';
 
 export interface LlmParams {
   prompt: string;
   schema: z.ZodSchema;
 }
 
-const invokeOpenAiClient = async (
+type OpenRouterChatCompletionCreateParams = ChatCompletionCreateParams & {
+  provider?: {
+    sort?: string;
+    require_parameters?: boolean;
+  };
+};
+
+const invokeOpenRouterClient = async (
   client: OpenAI,
-  params: ChatCompletionCreateParamsNonStreaming,
+  params: OpenRouterChatCompletionCreateParams,
   onChunk: (chunk: string) => void,
 ) => {
   const response = await client.chat.completions.create({
@@ -27,38 +34,38 @@ const invokeOpenAiClient = async (
   }
 };
 
-export const createOpenAiClientInterface = (client: OpenAI, model: string) => {
+export const createOpenRouterClientInterface = (client: OpenAI, model: string) => {
   return async (input: string, llmParams: LlmParams, onChunk: (chunk: string) => void) => {
     const { prompt, schema } = llmParams;
 
     const jsonSchema = zodToJsonSchema(schema);
 
-    const params: ChatCompletionCreateParams = {
+    const params: OpenRouterChatCompletionCreateParams = {
       model,
+      provider: {
+        sort: 'throughput',
+        require_parameters: true,
+      },
       messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: input,
-            },
-          ],
-        },
         {
           role: 'system',
           content: prompt,
+        },
+        {
+          role: 'user',
+          content: input,
         },
       ],
       response_format: {
         type: 'json_schema',
         json_schema: {
+          strict: true,
           name: 'extracted_json_data',
           schema: jsonSchema,
         },
       },
     };
 
-    await invokeOpenAiClient(client, params, onChunk);
+    await invokeOpenRouterClient(client, params, onChunk);
   };
 };
