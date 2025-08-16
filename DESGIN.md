@@ -39,7 +39,6 @@ The following design is for a Chrome extension that will identify code blocks in
 
 
 ### POC Tasks
-* Make LLM return structured json object rather then HTML to avoid prompt injection and lead to better consistency and improve LLM prompt
 * Scrub inputs to service workers
 * Have ability to select local LLMs
 * Have toggle to add button to code blocks that when clicked generates suggestions

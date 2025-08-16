@@ -1,5 +1,16 @@
 import { CODE_TOKEN_ID_NAME, Id, IdToCodeTokenMap } from '../htmlProcessing';
-import { NO_TIMEOUT_ACTIVE, TimeoutId, NoTimeoutActive, HoverHintState, HoverHint } from './types';
+import {
+  NO_TIMEOUT_ACTIVE,
+  TimeoutId,
+  NoTimeoutActive,
+  HoverHintState,
+  HoverHint,
+  HoverHintDocumentation,
+  isVariableDocumentation,
+  isObjectDocumentation,
+  isFunctionDocumentation,
+  FunctionDocumentation,
+} from './types';
 
 const MOUSE_EVENTS = {
   MOUSE_ENTER: 'mouseenter',
@@ -43,16 +54,88 @@ export const setupHoverHintTriggers = (element_to_listen_on: Document | HTMLElem
   );
 };
 
-export const attachHoverHint = (hoverHint: HoverHint, state: HoverHintState, idToCodeTokenMap: IdToCodeTokenMap) => {
-  const { tokenIds, docInHtml } = hoverHint;
-  tokenIds.forEach((tokenId) => {
-    state.hoverHintMap.set(tokenId, docInHtml);
+// Used to prevent cross-site scripting attacks
+const sanitizeHtml = (value: string) => {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
 
-    const codeToken = idToCodeTokenMap.get(tokenId);
+const getContainerStyle = () => {
+  return 'font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji; line-height: 1.5; color: #111827;';
+};
+
+const getPrimaryTextStyle = () => {
+  return 'margin: 0 0 8px 0; color: #111827; white-space: pre-wrap;';
+};
+
+const getSecondaryTextStyle = () => {
+  return 'color: #374151; white-space: pre-wrap;';
+};
+
+const getCodeBlockStyle = () => {
+  return 'margin: 0 0 8px 0; padding: 8px; background: #f7f7f8; border: 1px solid #e5e7eb; border-radius: 6px; white-space: pre-wrap; overflow-x: auto;';
+};
+
+const getCodeStyle = () => {
+  return 'font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace; font-size: 12px; color: #111827;';
+};
+
+const renderFunctionDocumentationAsHtml = (documentation: FunctionDocumentation) => {
+  const docString = documentation.docString ? sanitizeHtml(documentation.docString) : '';
+  const signature = sanitizeHtml(documentation.functionSignature);
+  const details = documentation.documentation ? sanitizeHtml(documentation.documentation) : '';
+
+  return `
+      <div style="${getContainerStyle()}">
+        ${docString ? `<div style="${getPrimaryTextStyle()}">${docString}</div>` : ''}
+        <pre style="${getCodeBlockStyle()}"><code style="${getCodeStyle()}">${signature}</code></pre>
+        ${details ? `<div style="${getSecondaryTextStyle()}">${details}</div>` : ''}
+      </div>
+    </div>
+  `;
+};
+
+const renderPlainTextDocumentationAsHtml = (text: string) => {
+  const body = sanitizeHtml(text);
+  return `
+    <div style="${getContainerStyle()}">
+      <div style="${getSecondaryTextStyle()}">${body}</div>
+    </div>
+  `;
+};
+
+const renderDocumentationAsHtml = (documentation: HoverHintDocumentation) => {
+  if (isFunctionDocumentation(documentation)) {
+    return renderFunctionDocumentationAsHtml(documentation);
+  }
+
+  if (isObjectDocumentation(documentation)) {
+    return renderPlainTextDocumentationAsHtml(documentation.docInHtml);
+  }
+
+  if (isVariableDocumentation(documentation)) {
+    return renderPlainTextDocumentationAsHtml(documentation.docInHtml);
+  }
+
+  console.error('Unknown documentation type', documentation);
+  return undefined;
+};
+
+export const attachHoverHint = (hoverHint: HoverHint, state: HoverHintState, idToCodeTokenMap: IdToCodeTokenMap) => {
+  const { ids, documentation } = hoverHint;
+  const renderedHtml = renderDocumentationAsHtml(documentation);
+
+  if (!renderedHtml) {
+    return;
+  }
+
+  ids.forEach((id) => {
+    state.hoverHintMap.set(id, renderedHtml);
+
+    const codeToken = idToCodeTokenMap.get(id);
     if (codeToken) {
       addEffectToCodeToken(codeToken);
     } else {
-      console.error(`Code token with id ${tokenId} not found in idToCodeTokenMap`);
+      console.error(`Code token with id ${id} not found in idToCodeTokenMap`);
     }
   });
 };
@@ -80,10 +163,10 @@ const onMouseEnterCodeToken = (event: MouseEvent, state: HoverHintState) => {
 
   clearTimeoutIfActive(state);
 
-  const docContent = state.hoverHintMap.get(tokenId);
+  const renderedHtml = state.hoverHintMap.get(tokenId);
 
-  if (docContent) {
-    showTooltip(docContent, event, state);
+  if (renderedHtml) {
+    showTooltip(renderedHtml, event, state);
   }
 };
 
@@ -126,8 +209,8 @@ const createTooltip = (): HTMLElement => {
   return tooltip;
 };
 
-const showTooltip = (docContent: string, event: MouseEvent, state: HoverHintState) => {
-  state.tooltip.innerHTML = docContent;
+const showTooltip = (html: string, event: MouseEvent, state: HoverHintState) => {
+  state.tooltip.innerHTML = html;
   positionTooltip(state.tooltip, event.target as HTMLElement);
   state.tooltip.style.display = 'block';
 };
