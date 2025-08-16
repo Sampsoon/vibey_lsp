@@ -39,7 +39,6 @@ The following design is for a Chrome extension that will identify code blocks in
 
 
 ### POC Tasks
-* Preprocess LLM HTML input
 * Make LLM return structured json object rather then HTML to avoid prompt injection and lead to better consistency and improve LLM prompt
 * Pick a good LLM
 * Stream json response rather then wait for the whole thing

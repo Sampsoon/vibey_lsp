@@ -1,7 +1,7 @@
 import { HoverHint, hoverHintListSchema, hoverHintSchema } from '../hoverHints';
 import { callLLM, LlmParams } from '../llm';
 import { createHoverHintStreamError, createHoverHintStreamMessage, parseListOfObjectsFromStream } from '../stream';
-import { RETRIEVAL_HOVER_HINTS_PROMPT } from './hoverHintRetrieval';
+import { cleanHoverHintRetrievalHtml, RETRIEVAL_HOVER_HINTS_PROMPT } from './hoverHintRetrieval';
 import { isHoverHintRetrievalMessage, ServiceWorkerMessage } from './interface';
 
 const retrieveHoverHintsStream = async (
@@ -17,13 +17,15 @@ const retrieveHoverHintsStream = async (
     schema: hoverHintListSchema,
   };
 
+  const cleanedHtml = cleanHoverHintRetrievalHtml(codeBlockRawHtml);
+
   let currentRetryDelay = RETRY_DELAY;
 
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
       const onParsedElement = parseListOfObjectsFromStream(hoverHintSchema, onHoverHint);
 
-      await callLLM.OPEN_ROUTER(codeBlockRawHtml, llmParams, onParsedElement);
+      await callLLM.OPEN_ROUTER(cleanedHtml, llmParams, onParsedElement);
 
       return;
     } catch (error) {
