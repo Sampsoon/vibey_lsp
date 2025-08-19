@@ -16,11 +16,10 @@ Exclude:
 - Common syntax elements
 - Elements that are obvious to the user such as \`const hello = "hello"\` or types in a JSON object
 
-Format all output content as plain text only. Do not use HTML tags or markdown under any circumstances.
+Format all output strings should be plain text only. Do not use HTML tags or markdown under any circumstances.
+This includes all strings, even those nested in json objects.
 
 Type mapping and fields:
 - Use lowercase category identifiers for the documentation type: function, object, variable.
 - Map elements: functions and methods → function; classes and objects → object; variables/constants → variable.
-- For type function, include fields: docString, functionSignature, documentation (all plain text).
-- For type object or variable, include field: docInHtml (plain text only).
 `;
