@@ -7,7 +7,7 @@ import prettier from 'eslint-plugin-prettier';
 import react from 'eslint-plugin-react';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: ['dist_chrome'] },
   {
     extends: [
       js.configs.recommended,
