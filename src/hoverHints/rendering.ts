@@ -7,42 +7,36 @@ import {
   DocString,
   ParamDocString,
   ReturnDocString,
+  ObjectDocumentation,
+  VariableDocumentation,
 } from './types';
+
+const CONTAINER_STYLE =
+  'font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5;';
+
+const PRIMARY_TEXT_STYLE = 'margin: 0 0 8px 0; white-space: pre-wrap;';
+
+const SECONDARY_TEXT_STYLE = 'color: #666; white-space: pre-wrap;';
+
+const CODE_CONTAINER_STYLE =
+  'margin: 0 0 8px 0; padding: 8px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; white-space: pre;';
+
+const CODE_TEXT_STYLE = 'font-family: monospace; font-size: 12px;';
 
 // Used to prevent cross-site scripting attacks
 const sanitizeHtml = (value: string) => {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
 
-const getContainerStyle = () => {
-  return 'font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji; line-height: 1.5; color: #111827;';
-};
-
-const getPrimaryTextStyle = () => {
-  return 'margin: 0 0 8px 0; color: #111827; white-space: pre-wrap;';
-};
-
-const getSecondaryTextStyle = () => {
-  return 'color: #374151; white-space: pre-wrap;';
-};
-
-const getCodeBlockStyle = () => {
-  return 'margin: 0 0 8px 0; padding: 8px; background: #f7f7f8; border: 1px solid #e5e7eb; border-radius: 6px; white-space: pre-wrap; overflow-x: auto;';
-};
-
-const getCodeStyle = () => {
-  return 'font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace; font-size: 12px; color: #111827;';
-};
-
 const renderParamDocStringAsHtml = (docString: ParamDocString) => {
   const name = sanitizeHtml(docString.name);
   const documentation = sanitizeHtml(docString.documentation);
-  return `<div style="${getPrimaryTextStyle()}">@Param ${name}: ${documentation}</div>`;
+  return `<div style="${PRIMARY_TEXT_STYLE}">@Param ${name}: ${documentation}</div>`;
 };
 
 const renderReturnDocStringAsHtml = (docString: ReturnDocString) => {
   const documentation = sanitizeHtml(docString.documentation);
-  return `<div style="${getPrimaryTextStyle()}">@Return: ${documentation}</div>`;
+  return `<div style="${PRIMARY_TEXT_STYLE}">@Return: ${documentation}</div>`;
 };
 
 const renderDocStringAsHtml = (docString: DocString) => {
@@ -56,23 +50,21 @@ const renderFunctionDocumentationAsHtml = (documentation: FunctionDocumentation)
   const signature = sanitizeHtml(documentation.functionSignature);
   const details = documentation.documentation ? sanitizeHtml(documentation.documentation) : '';
 
-  return `
-        <div style="${getContainerStyle()}">
-          <pre style="${getCodeBlockStyle()}"><code style="${getCodeStyle()}">${signature}</code></pre>
-          ${docString ? `<div style="${getPrimaryTextStyle()}">${docString}</div>` : ''}
-          ${details ? `<div style="${getSecondaryTextStyle()}">${details}</div>` : ''}
-        </div>
-      </div>
-    `;
+  const signatureHtml = `<pre style="${CODE_CONTAINER_STYLE}"><code style="${CODE_TEXT_STYLE}">${signature}</code></pre>`;
+  const docStringHtml = docString ? `<div style="${SECONDARY_TEXT_STYLE}">${docString}</div>` : '';
+  const detailsHtml = details ? `<div style="${PRIMARY_TEXT_STYLE}">${details}</div>` : '';
+
+  return `<div style="${CONTAINER_STYLE}">${signatureHtml}${docStringHtml}${detailsHtml}</div>`;
 };
 
-const renderPlainTextDocumentationAsHtml = (text: string) => {
-  const body = sanitizeHtml(text);
-  return `
-      <div style="${getContainerStyle()}">
-        <div style="${getSecondaryTextStyle()}">${body}</div>
-      </div>
-    `;
+const renderObjectDocumentationAsHtml = (documentation: ObjectDocumentation) => {
+  const body = sanitizeHtml(documentation.docInHtml);
+  return `<div style="${CONTAINER_STYLE}"><div style="${PRIMARY_TEXT_STYLE}">${body}</div></div>`;
+};
+
+const renderVariableDocumentationAsHtml = (documentation: VariableDocumentation) => {
+  const body = sanitizeHtml(documentation.docInHtml);
+  return `<div style="${CONTAINER_STYLE}"><div style="${PRIMARY_TEXT_STYLE}">${body}</div></div>`;
 };
 
 export const renderDocumentationAsHtml = (documentation: HoverHintDocumentation) => {
@@ -81,11 +73,11 @@ export const renderDocumentationAsHtml = (documentation: HoverHintDocumentation)
   }
 
   if (isObjectDocumentation(documentation)) {
-    return renderPlainTextDocumentationAsHtml(documentation.docInHtml);
+    return renderObjectDocumentationAsHtml(documentation);
   }
 
   if (isVariableDocumentation(documentation)) {
-    return renderPlainTextDocumentationAsHtml(documentation.docInHtml);
+    return renderVariableDocumentationAsHtml(documentation);
   }
 
   console.error('Unknown documentation type', documentation);

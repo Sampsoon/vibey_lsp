@@ -119,14 +119,14 @@ const createTooltip = (): HTMLElement => {
       position: fixed;
       background: white;
       color: black;
-      padding: 8px 12px;
       border-radius: 4px;
-      max-width: 400px;
+      width: max-content;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       z-index: 999999;
       display: none;
       pointer-events: none;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     `;
 
   document.body.appendChild(tooltip);
