@@ -1,4 +1,12 @@
 import {
+  applyCodeContainerStyle,
+  applyCodeTextStyle,
+  applyPrimaryTextStyle,
+  applySecondaryTextStyle,
+  applyTextContainerStyle,
+  setWidth,
+} from './styles';
+import {
   HoverHintDocumentation,
   isVariableDocumentation,
   isObjectDocumentation,
@@ -11,72 +19,114 @@ import {
   VariableDocumentation,
 } from './types';
 
-const MIN_WIDTH = '320px';
-
-const CONTAINER_STYLE =
-  'font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.5;';
-
-const PRIMARY_TEXT_STYLE = 'margin: 0 0 8px 0; white-space: pre-wrap; word-wrap: break-word;';
-
-const SECONDARY_TEXT_STYLE = 'color: #666; white-space: pre-wrap; word-wrap: break-word;';
-
-const CODE_CONTAINER_STYLE = `margin: 0 0 8px 0; padding: 8px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; white-space: pre; display: inline-block; min-width: ${MIN_WIDTH};`;
-
-const CODE_TEXT_STYLE = 'font-family: monospace; font-size: 12px;';
-
 // Used to prevent cross-site scripting attacks
 const sanitizeHtml = (value: string) => {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
 
+const renderSignatureAsHtml = (signature: string) => {
+  const sanitizedSignature = sanitizeHtml(signature);
+
+  const signatureElement = document.createElement('span');
+
+  applyCodeTextStyle(signatureElement.style);
+  applyCodeContainerStyle(signatureElement.style);
+
+  signatureElement.innerHTML = sanitizedSignature;
+
+  return signatureElement;
+};
+
 const renderParamDocStringAsHtml = (docString: ParamDocString) => {
   const name = sanitizeHtml(docString.name);
   const documentation = sanitizeHtml(docString.documentation);
-  return `<div style="${PRIMARY_TEXT_STYLE}">@Param ${name}: ${documentation}</div>`;
+  const div = document.createElement('div');
+  applyPrimaryTextStyle(div.style);
+  div.innerHTML = `@Param ${name}: ${documentation}`;
+  return div.outerHTML;
 };
 
 const renderReturnDocStringAsHtml = (docString: ReturnDocString) => {
   const documentation = sanitizeHtml(docString.documentation);
-  return `<div style="${PRIMARY_TEXT_STYLE}">@Return: ${documentation}</div>`;
+  const div = document.createElement('div');
+  applyPrimaryTextStyle(div.style);
+  div.innerHTML = `@Return: ${documentation}`;
+  return div.outerHTML;
 };
 
 const renderDocStringAsHtml = (docString: DocString) => {
+  const docStringElement = document.createElement('div');
+
+  applySecondaryTextStyle(docStringElement.style);
+  applyTextContainerStyle(docStringElement.style);
+
   const params = docString.params.map((param) => renderParamDocStringAsHtml(param));
   const returns = renderReturnDocStringAsHtml(docString.returns);
-  return `${params.join('')}${returns}`;
+  const renderedText = `${params.join('')}${returns}`;
+  docStringElement.innerHTML = renderedText;
+
+  return docStringElement;
+};
+
+const renderFunctionDocumentationTextAsHtml = (documentation: string) => {
+  const sanitizedDocumentation = sanitizeHtml(documentation);
+  const documentationElement = document.createElement('div');
+
+  applyPrimaryTextStyle(documentationElement.style);
+  applyTextContainerStyle(documentationElement.style);
+
+  documentationElement.innerHTML = sanitizedDocumentation;
+  return documentationElement;
 };
 
 const renderFunctionDocumentationAsHtml = (documentation: FunctionDocumentation) => {
-  const docString = documentation.docString ? renderDocStringAsHtml(documentation.docString) : '';
-  const rawSignature = documentation.functionSignature;
-  const signature = sanitizeHtml(rawSignature);
-  const details = documentation.documentation ? sanitizeHtml(documentation.documentation) : '';
+  const hoverHintElement = document.createElement('div');
 
-  const longestLineChars = rawSignature.split('\n').reduce((max, line) => {
-    if (line.length > max) {
-      return line.length;
-    }
-    return max;
-  }, 0);
+  const signatureElement = renderSignatureAsHtml(documentation.functionSignature);
+  hoverHintElement.appendChild(signatureElement);
 
-  const wrapperWidth = `max(${MIN_WIDTH}, ${String(longestLineChars)}ch)`;
-  const containerStyleWithWidth = `${CONTAINER_STYLE} display: inline-block; width: ${wrapperWidth}; min-width: ${MIN_WIDTH};`;
+  if (documentation.docString) {
+    const docStringElement = renderDocStringAsHtml(documentation.docString);
+    setWidth(docStringElement, signatureElement.offsetWidth);
+    hoverHintElement.appendChild(docStringElement);
+  }
 
-  const signatureHtml = `<pre style="${CODE_CONTAINER_STYLE}"><code style="${CODE_TEXT_STYLE}">${signature}</code></pre>`;
-  const docStringHtml = docString ? `<div style="${SECONDARY_TEXT_STYLE}">${docString}</div>` : '';
-  const detailsHtml = details ? `<div style="${PRIMARY_TEXT_STYLE}">${details}</div>` : '';
+  if (documentation.documentation) {
+    const documentationElement = renderFunctionDocumentationTextAsHtml(documentation.documentation);
+    setWidth(documentationElement, signatureElement.offsetWidth);
+    hoverHintElement.appendChild(documentationElement);
+  }
 
-  return `<div style="${containerStyleWithWidth}">${signatureHtml}${docStringHtml}${detailsHtml}</div>`;
+  const renderedElement = hoverHintElement.outerHTML;
+  hoverHintElement.remove();
+
+  return renderedElement;
 };
 
 const renderObjectDocumentationAsHtml = (documentation: ObjectDocumentation) => {
   const body = sanitizeHtml(documentation.docInHtml);
-  return `<div style="${CONTAINER_STYLE}"><div style="${PRIMARY_TEXT_STYLE}">${body}</div></div>`;
+  const container = document.createElement('div');
+  applyTextContainerStyle(container.style);
+
+  const contentDiv = document.createElement('div');
+  applyPrimaryTextStyle(contentDiv.style);
+  contentDiv.innerHTML = body;
+
+  container.appendChild(contentDiv);
+  return container.outerHTML;
 };
 
 const renderVariableDocumentationAsHtml = (documentation: VariableDocumentation) => {
   const body = sanitizeHtml(documentation.docInHtml);
-  return `<div style="${CONTAINER_STYLE}"><div style="${PRIMARY_TEXT_STYLE}">${body}</div></div>`;
+  const container = document.createElement('div');
+  applyTextContainerStyle(container.style);
+
+  const contentDiv = document.createElement('div');
+  applyPrimaryTextStyle(contentDiv.style);
+  contentDiv.innerHTML = body;
+
+  container.appendChild(contentDiv);
+  return container.outerHTML;
 };
 
 export const renderDocumentationAsHtml = (documentation: HoverHintDocumentation) => {

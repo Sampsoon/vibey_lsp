@@ -1,5 +1,6 @@
 import { CODE_TOKEN_ID_NAME, Id, IdToCodeTokenMap } from '../htmlProcessing';
 import { renderDocumentationAsHtml } from './rendering';
+import { applyHoverHintStyle, hideElement } from './styles';
 import { NO_TIMEOUT_ACTIVE, TimeoutId, NoTimeoutActive, HoverHintState, HoverHint } from './types';
 
 const MOUSE_EVENTS = {
@@ -115,19 +116,8 @@ const onMouseLeaveCodeToken = (event: MouseEvent, state: HoverHintState) => {
 const createTooltip = (): HTMLElement => {
   const tooltip = document.createElement('div');
   tooltip.className = 'vibey-tooltip';
-  tooltip.style.cssText = `
-      position: fixed;
-      background: white;
-      color: black;
-      border-radius: 4px;
-      width: max-content;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      z-index: 999999;
-      display: none;
-      pointer-events: none;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    `;
+  applyHoverHintStyle(tooltip.style);
+  hideElement(tooltip);
 
   document.body.appendChild(tooltip);
   return tooltip;
