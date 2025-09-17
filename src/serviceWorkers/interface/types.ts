@@ -16,6 +16,10 @@ export interface HoverHintRetrievalMessage extends ServiceWorkerMessage<HoverHin
   payload: HoverHintRetrievalPayload;
 }
 
+export const isServiceWorkerMessage = (message: unknown): message is ServiceWorkerMessage<unknown> => {
+  return message !== null && typeof message === 'object' && 'type' in message && 'payload' in message;
+};
+
 export const isHoverHintRetrievalMessage = (
   message: ServiceWorkerMessage<unknown>,
 ): message is HoverHintRetrievalMessage => {

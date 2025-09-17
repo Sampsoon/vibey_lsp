@@ -16,15 +16,16 @@
     "openai": "^4.103.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "webextension-polyfill": "^0.12.0",
     "zod": "^3.25.28",
     "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
-    "@types/chrome": "^0.0.309",
     "@types/node": "^20.17.11",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
+    "@types/webextension-polyfill": "^0.12.3",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",

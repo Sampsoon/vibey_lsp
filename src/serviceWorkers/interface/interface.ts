@@ -2,6 +2,7 @@ import { HoverHint } from '../../hoverHints';
 import { CodeBlock } from '../../htmlProcessing';
 import { isHoverHintStreamError, isHoverHintStreamMessage } from '../../stream';
 import { ServiceWorkerMessageType, HoverHintRetrievalMessage } from './types';
+import browser from 'webextension-polyfill';
 
 export const invokeHoverHintRetrievalServiceWorker = async (codeBlock: CodeBlock) => {
   const message: HoverHintRetrievalMessage = {
@@ -11,7 +12,7 @@ export const invokeHoverHintRetrievalServiceWorker = async (codeBlock: CodeBlock
     },
   };
 
-  await chrome.runtime.sendMessage(message);
+  await browser.runtime.sendMessage(message);
 };
 
 export const listenForHoverHintsFromServiceWorker = (processHoverHint: (hoverHint: HoverHint) => void) => {
@@ -26,5 +27,5 @@ export const listenForHoverHintsFromServiceWorker = (processHoverHint: (hoverHin
     }
   };
 
-  chrome.runtime.onMessage.addListener(messageListener);
+  browser.runtime.onMessage.addListener(messageListener);
 };

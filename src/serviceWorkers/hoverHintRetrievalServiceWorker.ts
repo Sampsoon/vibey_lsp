@@ -2,7 +2,8 @@ import { HoverHint, hoverHintListSchema, hoverHintSchema } from '../hoverHints';
 import { callLLM, LlmParams } from '../llm';
 import { createHoverHintStreamError, createHoverHintStreamMessage, parseListOfObjectsFromStream } from '../stream';
 import { cleanHoverHintRetrievalHtml, RETRIEVAL_HOVER_HINTS_PROMPT } from './hoverHintRetrieval';
-import { isHoverHintRetrievalMessage, ServiceWorkerMessage } from './interface';
+import { isHoverHintRetrievalMessage, isServiceWorkerMessage } from './interface';
+import browser from 'webextension-polyfill';
 
 const retrieveHoverHintsStream = async (
   codeBlockRawHtml: string,
@@ -38,8 +39,8 @@ const retrieveHoverHintsStream = async (
   onError('Failed to retrieve annotations after 5 retries');
 };
 
-chrome.runtime.onMessage.addListener((message: ServiceWorkerMessage<unknown>, sender) => {
-  if (!isHoverHintRetrievalMessage(message)) {
+browser.runtime.onMessage.addListener((message: unknown, sender: browser.Runtime.MessageSender) => {
+  if (!isServiceWorkerMessage(message) || !isHoverHintRetrievalMessage(message)) {
     return;
   }
 
@@ -53,12 +54,10 @@ chrome.runtime.onMessage.addListener((message: ServiceWorkerMessage<unknown>, se
   void retrieveHoverHintsStream(
     message.payload.codeBlockRawHtml,
     (hoverHint) => {
-      void chrome.tabs.sendMessage(tabId, createHoverHintStreamMessage(hoverHint));
+      void browser.tabs.sendMessage(tabId, createHoverHintStreamMessage(hoverHint));
     },
     (errorMessage) => {
-      void chrome.tabs.sendMessage(tabId, createHoverHintStreamError(errorMessage));
+      void browser.tabs.sendMessage(tabId, createHoverHintStreamError(errorMessage));
     },
   );
-
-  return true;
 });
