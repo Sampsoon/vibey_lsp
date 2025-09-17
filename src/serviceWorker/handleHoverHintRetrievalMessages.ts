@@ -2,7 +2,7 @@ import { HoverHint, hoverHintListSchema, hoverHintSchema } from '../hoverHints';
 import { callLLM, LlmParams } from '../llm';
 import { createHoverHintStreamError, createHoverHintStreamMessage, parseListOfObjectsFromStream } from '../stream';
 import { cleanHoverHintRetrievalHtml, RETRIEVAL_HOVER_HINTS_PROMPT } from './hoverHintRetrieval';
-import { isHoverHintRetrievalMessage, isServiceWorkerMessage } from './interface';
+import { HoverHintRetrievalMessage } from './interface';
 import browser from 'webextension-polyfill';
 
 const retrieveHoverHintsStream = async (
@@ -39,15 +39,14 @@ const retrieveHoverHintsStream = async (
   onError('Failed to retrieve annotations after 5 retries');
 };
 
-browser.runtime.onMessage.addListener((message: unknown, sender: browser.Runtime.MessageSender) => {
-  if (!isServiceWorkerMessage(message) || !isHoverHintRetrievalMessage(message)) {
-    return;
-  }
-
+const handleHoverHintRetrievalMessages = (
+  message: HoverHintRetrievalMessage,
+  sender: browser.Runtime.MessageSender,
+) => {
   const tabId = sender.tab?.id;
 
   if (!tabId) {
-    console.error('No tab id found');
+    console.error('No tab id found in handleHoverHintRetrievalMessages');
     return;
   }
 
@@ -60,4 +59,6 @@ browser.runtime.onMessage.addListener((message: unknown, sender: browser.Runtime
       void browser.tabs.sendMessage(tabId, createHoverHintStreamError(errorMessage));
     },
   );
-});
+};
+
+export default handleHoverHintRetrievalMessages;

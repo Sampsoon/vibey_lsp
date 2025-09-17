@@ -14,7 +14,7 @@ import {
   PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME,
 } from '../htmlProcessing';
 import { attachHoverHint, setupHoverHintState, setupHoverHintTriggers } from '../hoverHints';
-import { invokeHoverHintRetrievalServiceWorker, listenForHoverHintsFromServiceWorker } from '../serviceWorkers';
+import { invokeHoverHintRetrievalServiceWorker, listenForHoverHintsFromServiceWorker } from '../serviceWorker';
 
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_MUTATIONS_STABLE = 800;
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE = 1000;
