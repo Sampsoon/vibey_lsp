@@ -27,7 +27,8 @@ browser.runtime.onMessage.addListener((message: unknown, sender: browser.Runtime
 
   if (isHoverHintRetrievalMessage(message)) {
     handleHoverHintRetrievalMessages(message, sender);
+    return;
   }
 
-  console.error('Invalid service worker message', message);
+  console.error('No handler for service worker message type', message);
 });
