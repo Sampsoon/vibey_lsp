@@ -56,9 +56,19 @@ const functionDocumentationSchema = z.object({
 
 export type FunctionDocumentation = z.infer<typeof functionDocumentationSchema>;
 
+const propertyDocStringSchema = z.object({
+  name: z.string().describe('The name of the property'),
+  documentation: z.string().describe('The documentation for the property'),
+});
+
+export type PropertyDocString = z.infer<typeof propertyDocStringSchema>;
+
 const objectDocumentationSchema = z.object({
-  type: z.literal(TOKEN_TYPES.OBJECT),
+  type: z
+    .literal(TOKEN_TYPES.OBJECT)
+    .describe('Designates the documentation as object documentation. An object is anything that has fields.'),
   docInHtml: z.string(),
+  properties: z.array(propertyDocStringSchema).optional().describe('The properties / fields on the object'),
 });
 
 export type ObjectDocumentation = z.infer<typeof objectDocumentationSchema>;

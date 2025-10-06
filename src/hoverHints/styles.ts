@@ -3,6 +3,12 @@ export enum MarginSize {
   LARGE = '0.75em',
 }
 
+export enum DocStringCommand {
+  PARAM = '@Param',
+  RETURN = '@Return',
+  PROPERTY = '@Property',
+}
+
 const TEXT_FONT_SIZE = '14px';
 
 export function applyHoverHintStyle(styles: CSSStyleDeclaration) {
@@ -58,4 +64,8 @@ export function applyTopMarginStyle(styles: CSSStyleDeclaration, marginSize: str
 
 export function applySemiBoldTextStyle(styles: CSSStyleDeclaration) {
   styles.fontWeight = '500';
+}
+
+export function createDocStringCommandElement(command: DocStringCommand) {
+  return `<i>${command}</i>`;
 }
