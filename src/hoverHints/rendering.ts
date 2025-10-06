@@ -8,7 +8,6 @@ import {
   applyTopMarginStyle,
   applySemiBoldTextStyle,
   MarginSize,
-  createDocStringCommandElement,
   DocStringCommand,
 } from './styles';
 import {
@@ -45,48 +44,40 @@ function renderSignatureAsHtml(signature: string) {
   return signatureElement;
 }
 
-function renderParamDocStringAsHtml(docString: ParamDocString) {
-  const name = sanitizeHtml(docString.name);
-  const documentation = sanitizeHtml(docString.documentation);
+function renderDocStringAsHtml(command: DocStringCommand, documentation: string, name?: string) {
+  const sanitizedDocumentation = sanitizeHtml(documentation);
+
   const div = document.createElement('div');
 
   applyPrimaryTextStyle(div.style);
   applyBottomMarginStyle(div.style);
 
-  const nameSpan = document.createElement('span');
-  applySemiBoldTextStyle(nameSpan.style);
-  nameSpan.textContent = name;
+  if (name) {
+    const sanitizedName = sanitizeHtml(name);
+    const nameSpan = document.createElement('span');
+    applySemiBoldTextStyle(nameSpan.style);
+    nameSpan.textContent = sanitizedName;
+    div.innerHTML = ` <i>${command}</i> ${nameSpan.outerHTML} — ${sanitizedDocumentation}`;
+    return div.outerHTML;
+  }
 
-  div.innerHTML = ` ${createDocStringCommandElement(DocStringCommand.PARAM)} ${nameSpan.outerHTML} — ${documentation}`;
+  div.innerHTML = ` <i>${command}</i> ${sanitizedDocumentation}`;
   return div.outerHTML;
+}
+
+function renderParamDocStringAsHtml(docString: ParamDocString) {
+  return renderDocStringAsHtml(DocStringCommand.PARAM, docString.documentation, docString.name);
 }
 
 function renderReturnDocStringAsHtml(docString: ReturnDocString) {
-  const documentation = sanitizeHtml(docString.documentation);
-  const div = document.createElement('div');
-  applyPrimaryTextStyle(div.style);
-  applyBottomMarginStyle(div.style);
-  div.innerHTML = ` ${createDocStringCommandElement(DocStringCommand.RETURN)} — ${documentation}`;
-  return div.outerHTML;
+  return renderDocStringAsHtml(DocStringCommand.RETURN, docString.documentation);
 }
 
-function renderPropertyDocStringAsHtml(docString: PropertyDocString) {
-  const name = sanitizeHtml(docString.name);
-  const documentation = sanitizeHtml(docString.documentation);
-  const div = document.createElement('div');
-
-  applyPrimaryTextStyle(div.style);
-  applyBottomMarginStyle(div.style);
-
-  const nameSpan = document.createElement('span');
-  applySemiBoldTextStyle(nameSpan.style);
-  nameSpan.textContent = name;
-
-  div.innerHTML = ` ${createDocStringCommandElement(DocStringCommand.PROPERTY)} ${nameSpan.outerHTML} — ${documentation}`;
-  return div.outerHTML;
+function renderObjectPropertyDocStringAsHtml(docString: PropertyDocString) {
+  return renderDocStringAsHtml(DocStringCommand.PROPERTY, docString.documentation, docString.name);
 }
 
-function renderDocStringAsHtml(docString: DocString) {
+function renderFunctionDocStringAsHtml(docString: DocString) {
   const docStringElement = document.createElement('div');
 
   applySecondaryTextStyle(docStringElement.style);
@@ -100,13 +91,13 @@ function renderDocStringAsHtml(docString: DocString) {
   return docStringElement;
 }
 
-function renderPropertiesAsHtml(properties: PropertyDocString[]) {
+function renderObjectPropertiesAsHtml(properties: PropertyDocString[]) {
   const propertiesElement = document.createElement('div');
 
   applySecondaryTextStyle(propertiesElement.style);
   applyTextContainerStyle(propertiesElement.style);
 
-  const renderedProperties = properties.map((property) => renderPropertyDocStringAsHtml(property));
+  const renderedProperties = properties.map((property) => renderObjectPropertyDocStringAsHtml(property));
   propertiesElement.innerHTML = renderedProperties.join('');
 
   return propertiesElement;
@@ -145,7 +136,7 @@ function renderFunctionDocumentationAsHtml(documentation: FunctionDocumentation)
   hoverHintElement.appendChild(signatureElement);
 
   if (documentation.docString) {
-    const docStringElement = renderDocStringAsHtml(documentation.docString);
+    const docStringElement = renderFunctionDocStringAsHtml(documentation.docString);
     hoverHintElement.appendChild(docStringElement);
   }
 
@@ -169,7 +160,7 @@ function renderObjectDocumentationAsHtml(documentation: ObjectDocumentation) {
   }
 
   if (documentation.properties) {
-    const propertiesElement = renderPropertiesAsHtml(documentation.properties);
+    const propertiesElement = renderObjectPropertiesAsHtml(documentation.properties);
     hoverHintElement.appendChild(propertiesElement);
   }
 

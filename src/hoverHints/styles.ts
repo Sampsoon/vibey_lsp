@@ -65,7 +65,3 @@ export function applyTopMarginStyle(styles: CSSStyleDeclaration, marginSize: str
 export function applySemiBoldTextStyle(styles: CSSStyleDeclaration) {
   styles.fontWeight = '500';
 }
-
-export function createDocStringCommandElement(command: DocStringCommand) {
-  return `<i>${command}</i>`;
-}
