@@ -22,6 +22,7 @@ import {
   ObjectDocumentation,
   VariableDocumentation,
   PropertyDocString,
+  TokenToCssStylingMap,
 } from './types';
 
 // Used to prevent cross-site scripting attacks
@@ -29,7 +30,24 @@ function sanitizeHtml(value: string) {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function renderSignatureAsHtml(signature: string) {
+function applyTokenToCssStylingMap(signature: string, tokenToCssStylingMap: TokenToCssStylingMap) {
+  for (const [token, styling] of Object.entries(tokenToCssStylingMap)) {
+    if (!styling.class && !styling.style) {
+      continue;
+    }
+
+    const classAttr = styling.class ? ` class="${styling.class}"` : '';
+    const styleAttr = styling.style ? ` style="${styling.style}"` : '';
+
+    const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const tokenRegex = new RegExp(`\\b${escapedToken}\\b`, 'g');
+    signature = signature.replace(tokenRegex, `<span${classAttr}${styleAttr}>${token}</span>`);
+  }
+
+  return signature;
+}
+
+function renderSignatureAsHtml(signature: string, tokenToCssStylingMap: TokenToCssStylingMap | undefined) {
   const sanitizedSignature = sanitizeHtml(signature);
 
   const signatureElement = document.createElement('div');
@@ -39,7 +57,9 @@ function renderSignatureAsHtml(signature: string) {
   applyTopMarginStyle(signatureElement.style);
   applyBottomMarginStyle(signatureElement.style, MarginSize.LARGE);
 
-  signatureElement.innerHTML = sanitizedSignature;
+  signatureElement.innerHTML = tokenToCssStylingMap
+    ? applyTokenToCssStylingMap(sanitizedSignature, tokenToCssStylingMap)
+    : sanitizedSignature;
 
   return signatureElement;
 }
@@ -132,7 +152,7 @@ function renderObjectDocumentationTextAsHtml(documentation: string) {
 function renderFunctionDocumentationAsHtml(documentation: FunctionDocumentation) {
   const hoverHintElement = document.createElement('div');
 
-  const signatureElement = renderSignatureAsHtml(documentation.functionSignature);
+  const signatureElement = renderSignatureAsHtml(documentation.functionSignature, documentation.tokenToCssStylingMap);
   hoverHintElement.appendChild(signatureElement);
 
   if (documentation.docString) {
@@ -184,8 +204,6 @@ function renderVariableDocumentationAsHtml(documentation: VariableDocumentation)
 }
 
 export function renderDocumentationAsHtml(documentation: HoverHintDocumentation) {
-  console.log('rendering documentation', documentation);
-
   if (isFunctionDocumentation(documentation)) {
     return renderFunctionDocumentationAsHtml(documentation);
   }

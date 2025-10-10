@@ -22,4 +22,11 @@ This includes all strings, even those nested in json objects.
 Type mapping and fields:
 - Use lowercase category identifiers for the documentation type: function, object, variable.
 - Map elements: functions and methods → function; classes and objects → object; variables/constants → variable.
+
+For function documentation:
+- ALWAYS include the tokenToCssStylingMap field whenever possible.
+- This map applies CSS styling (class and/or style attributes) to tokens in the function signature to match the color theme of the code block.
+- Extract class and style attributes from the cleaned HTML input for each token that appears in the function signature.
+- Only include tokens that are part of the signature itself (function name, parameter names, type names, return type, etc.).
+- If a token in the signature doesn't appear in the code block, infer appropriate styling from similar tokens if available.
 `;

@@ -27,6 +27,15 @@ const docStringSchema = z.object({
 
 export type DocString = z.infer<typeof docStringSchema>;
 
+const tokenToCssStylingMapSchema = z.record(
+  z.object({
+    class: z.string().optional(),
+    style: z.string().optional(),
+  }),
+);
+
+export type TokenToCssStylingMap = z.infer<typeof tokenToCssStylingMapSchema>;
+
 const functionDocumentationSchema = z.object({
   type: z.literal(TOKEN_TYPES.FUNCTION).describe(`Marks this as function documentation.`),
   functionSignature: z.string().describe(`Function signature including return type and argument types.`),
@@ -47,6 +56,104 @@ const functionDocumentationSchema = z.object({
     May include usage examples but avoid verbosity.
     Only include if not obvious to the user.`,
     ),
+  tokenToCssStylingMap: tokenToCssStylingMapSchema.optional().describe(`
+    CSS styling that should be applied to each keyword in the function signature.
+    This is used to apply the same color theme to the function signature as the code block that was just inputted.
+    The HTML input will be cleaned and simplified before being sent to you.
+    
+    For example, cleaned HTML might look like:
+  
+    \`\`\`html
+    <id=comment1 class="hljs-comment"/>// A basic TypeScript function example</>
+    
+    <id=keyword1 class="hljs-keyword"/>function</> <id=func1 class="hljs-title function_"/>greetUser</>(<id=param1/>name</>: <id=type1 class="hljs-built_in"/>string</>, <id=param2/>age</>?: <id=type2 class="hljs-built_in"/>number</>): <id=type3 class="hljs-built_in"/>string</> {
+      <id=keyword2 class="hljs-keyword"/>if</> (<id=param2b/>age</> !== <id=lit1 class="hljs-literal"/>undefined</>) {
+        <id=keyword3 class="hljs-keyword"/>return</> <id=str1 class="hljs-string"/>\`Hello, \${<id=param1b/>name</>}! You are \${<id=param2c/>age</>} years old.\`</>;
+      }
+      <id=keyword4 class="hljs-keyword"/>return</> <id=str2 class="hljs-string"/>\`Hello, \${<id=param1c/>name</>}!\`</>;
+    }
+    \`\`\`
+    
+    The map would be:
+      "greetUser": {
+        "class": "hljs-title function_"
+      },
+      "string": {
+        "class": "hljs-built_in"
+      },
+      "number": {
+        "class": "hljs-built_in"
+      }
+    }
+    Only include styling for the tokens that are in the function signature. For example, function is not in the signature:
+    \`greetUser(name: string, age?: number): string\`
+
+    If a token in the signature does not appear in the code block, infer that the style would be if there is an appropriate example in the code block for that type of token.
+    For example:
+    
+    \`\`\`html
+    <id=-7kk292 class="hljs-comment"/>// Nobody knows what this actually does.</>
+    <id=-6mfgg2/></>// But if you remove it, the whole simulation desynchronizes.</>
+    <id=kw1 class="hljs-keyword"/>const</> coherence = <id=fn1 class="hljs-title function_"/>quantizeEntropyField</>({  <id=attr1 class="hljs-attr"/>seed</>: <id=num1 class="hljs-number"/>0xdeadbeef</>,  <id=attr2 class="hljs-attr"/>drift</>: <id=cls1 class="hljs-title class_"/>Math</>.<id=fn2 class="hljs-title function_"/>random</>() * <id=num2 class="hljs-number"/>0.0001</>,  <id=attr3 class="hljs-attr"/>granularity</>: <id=num3 class="hljs-number"/>4096</>,  <id=attr4 class="hljs-attr"/>mode</>: <id=str1 class="hljs-string"/>"stochastic-tiling"</>,});<id=var1 class="hljs-variable language_"/>console</>.<id=fn3 class="hljs-title function_"/>log</>(<id=str2 class="hljs-string"/>"Field coherence:"</>, coherence);
+    \`\`\`
+    
+    The map would be:
+    {
+      "quantizeEntropyField": {
+        "class": "hljs-title function_"
+      },
+      "seed": {
+        "class": "hljs-attr"
+      },
+      "drift": {
+        "class": "hljs-attr"
+      },
+      "granularity": {
+        "class": "hljs-attr"
+      },
+      "mode": {
+        "class": "hljs-attr"
+      },
+      "number": {
+        "class": "hljs-attr
+      },
+      "string": {
+        "class": "hljs-attr"
+      },
+      "coherence": {
+        "class": "hljs-attr"
+      }
+    }
+
+    As the signature would be:
+    \`quantizeEntropyField(config: { seed: number, drift: number, granularity: number, mode: string }): coherence\`
+    
+
+    If there is any styling on the token's tag, it would be set in the style attribute.
+    For example:
+    
+    \`\`\`html
+    <id=kw1 style="color: #569cd6;"/>function</> <id=fn1 class="hljs-title function_"/>processData</>(<id=p1 style="color: #9cdcfe;"/>input</>: <id=t1 class="hljs-built_in" style="color: #4ec9b0;"/>string</>): <id=t2 class="hljs-built_in" style="color: #4ec9b0;"/>void</>
+    \`\`\`
+    
+    The map would be:
+    {
+      "processData": {
+        "class": "hljs-title function_"
+      },
+      "input": {
+        "style": "color: #9cdcfe;"
+      },
+      "string": {
+        "class": "hljs-built_in",
+        "style": "color: #4ec9b0;"
+      },
+      "void": {
+        "class": "hljs-built_in",
+        "style": "color: #4ec9b0;"
+      }
+    }
+    `),
 });
 
 export type FunctionDocumentation = z.infer<typeof functionDocumentationSchema>;
