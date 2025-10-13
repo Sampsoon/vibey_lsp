@@ -73,3 +73,4 @@ The following design is for a Chrome extension that will identify code blocks in
 ### House Keeping
 * Clean up `processCodeBlocks.ts`
 * Clean up state management
+* Take another look at style generation code as see if it can be improved. In doing so, check if caching in necessary, because it can get stale if the user changes the theme.

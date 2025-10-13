@@ -1,11 +1,12 @@
 import {
   CODE_BLOCK_ALREADY_PROCESSED,
   CodeBlock,
+  CodeBlockId,
   CodeBlockStabilityTimer,
   CodeBlockTrackingState,
   CodeBlockTrackingTable,
-  Id,
-  IdToCodeTokenMap,
+  CodeTokenId,
+  IdMappings,
 } from './types';
 
 const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
@@ -128,8 +129,10 @@ function wrapTokensInSpans(element: HTMLElement) {
   });
 }
 
-export function attachIdsToTokens(code: CodeBlock, idToCodeTokenMap: IdToCodeTokenMap) {
+export function attachIdsToTokens(code: CodeBlock, idMappings: IdMappings) {
   const { html } = code;
+  const { codeTokenElementMap } = idMappings;
+  const { parentCodeBlockMap } = idMappings;
 
   wrapTokensInSpans(html);
 
@@ -138,8 +141,10 @@ export function attachIdsToTokens(code: CodeBlock, idToCodeTokenMap: IdToCodeTok
   codeTokens.forEach((token) => {
     if (!token.dataset[CODE_TOKEN_ID_NAME]) {
       const id = generateRandomId();
+
       token.dataset[CODE_TOKEN_ID_NAME] = id;
-      idToCodeTokenMap.set(id, token);
+      codeTokenElementMap.set(id, token);
+      parentCodeBlockMap.set(id, code);
     }
   });
 }
@@ -164,13 +169,16 @@ export function getOrAddIdToCodeBlock(element: HTMLElement): { id: string; isNew
 
 export function setupCodeBlockTracking(): CodeBlockTrackingState {
   return {
-    mutatedCodeBlocksLookupTable: new Map<Id, CodeBlockStabilityTimer>(),
-    codeBlocksInViewLookupTable: new Map<Id, CodeBlockStabilityTimer>(),
+    mutatedCodeBlocksLookupTable: new Map<CodeBlockId, CodeBlockStabilityTimer>(),
+    codeBlocksInViewLookupTable: new Map<CodeBlockId, CodeBlockStabilityTimer>(),
   };
 }
 
-export function setupIdToCodeTokenMap(): IdToCodeTokenMap {
-  return new Map<Id, HTMLElement>();
+export function setupIdToElementMapping(): IdMappings {
+  return {
+    codeTokenElementMap: new Map<CodeTokenId, HTMLElement>(),
+    parentCodeBlockMap: new Map<CodeTokenId, CodeBlock>(),
+  };
 }
 
 export function clearCodeBlockTimeoutIfExists(trackingTable: CodeBlockTrackingTable, id: string) {

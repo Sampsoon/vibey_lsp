@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { Id } from '../htmlProcessing';
+import { CodeBlockId, CodeTokenId } from '../htmlProcessing';
 
 const TOKEN_TYPES = {
   FUNCTION: 'function',
@@ -231,7 +231,8 @@ export type NoTimeoutActive = typeof NO_TIMEOUT_ACTIVE;
 export type TimeoutId = number | NoTimeoutActive;
 
 export interface HoverHintState {
-  hoverHintMap: Map<Id, string>;
+  hoverHintMap: Map<CodeTokenId, string>;
   tooltip: HTMLElement;
   timeoutId: TimeoutId;
+  currentCodeBlockId: CodeBlockId | undefined;
 }

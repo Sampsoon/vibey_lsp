@@ -7,8 +7,9 @@ export type {
   CodeBlockStabilityTimer,
   CodeBlockTrackingState,
   CodeBlockTrackingTable,
-  IdToCodeTokenMap,
-  Id,
+  IdMappings,
+  CodeBlockId,
+  CodeTokenId,
 } from './types';
 
 export {
@@ -19,7 +20,7 @@ export {
   CODE_TOKEN_ID_NAME,
   attachIdsToTokens,
   isCodeBlockInView,
-  setupIdToCodeTokenMap,
+  setupIdToElementMapping,
   PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME,
 } from './codeBlocks';
 

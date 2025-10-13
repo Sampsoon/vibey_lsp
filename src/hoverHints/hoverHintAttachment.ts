@@ -1,6 +1,6 @@
-import { CODE_TOKEN_ID_NAME, Id, IdToCodeTokenMap } from '../htmlProcessing';
+import { CODE_TOKEN_ID_NAME, CodeTokenId, IdMappings } from '../htmlProcessing';
 import { renderDocumentationAsHtml } from './rendering';
-import { applyHoverHintStyle, hideElement } from './styles';
+import { applyHoverHintStyle, hideElement, styleTooltip } from './styles';
 import { NO_TIMEOUT_ACTIVE, TimeoutId, NoTimeoutActive, HoverHintState, HoverHint } from './types';
 
 const MOUSE_EVENTS = {
@@ -21,17 +21,22 @@ function clearTimeoutIfActive(state: HoverHintState) {
 
 export function setupHoverHintState(): HoverHintState {
   return {
-    hoverHintMap: new Map<Id, string>(),
+    hoverHintMap: new Map<CodeTokenId, string>(),
     tooltip: createTooltip(),
     timeoutId: NO_TIMEOUT_ACTIVE,
+    currentCodeBlockId: undefined,
   };
 }
 
-export function setupHoverHintTriggers(element_to_listen_on: Document | HTMLElement, state: HoverHintState) {
+export function setupHoverHintTriggers(
+  element_to_listen_on: Document | HTMLElement,
+  idMappings: IdMappings,
+  state: HoverHintState,
+) {
   element_to_listen_on.addEventListener(
     MOUSE_EVENTS.MOUSE_ENTER,
     (event) => {
-      onMouseEnterCodeToken(event as MouseEvent, state);
+      onMouseEnterCodeToken(event as MouseEvent, idMappings, state);
     },
     true,
   );
@@ -45,8 +50,10 @@ export function setupHoverHintTriggers(element_to_listen_on: Document | HTMLElem
   );
 }
 
-export function attachHoverHint(hoverHint: HoverHint, state: HoverHintState, idToCodeTokenMap: IdToCodeTokenMap) {
+export function attachHoverHint(hoverHint: HoverHint, state: HoverHintState, idMappings: IdMappings) {
   const { ids, documentation } = hoverHint;
+  const { codeTokenElementMap } = idMappings;
+
   const renderedHtml = renderDocumentationAsHtml(documentation);
 
   if (!renderedHtml) {
@@ -56,7 +63,7 @@ export function attachHoverHint(hoverHint: HoverHint, state: HoverHintState, idT
   ids.forEach((id) => {
     state.hoverHintMap.set(id, renderedHtml);
 
-    const codeToken = idToCodeTokenMap.get(id);
+    const codeToken = codeTokenElementMap.get(id);
     if (codeToken) {
       addEffectToCodeToken(codeToken);
     } else {
@@ -73,7 +80,7 @@ function isHTMLElement(target: EventTarget | null): target is HTMLElement {
   return target instanceof HTMLElement;
 }
 
-function onMouseEnterCodeToken(event: MouseEvent, state: HoverHintState) {
+function onMouseEnterCodeToken(event: MouseEvent, idMappings: IdMappings, state: HoverHintState) {
   const target = event.target;
 
   if (!isHTMLElement(target)) {
@@ -91,7 +98,7 @@ function onMouseEnterCodeToken(event: MouseEvent, state: HoverHintState) {
   const renderedHtml = state.hoverHintMap.get(tokenId);
 
   if (renderedHtml) {
-    showTooltip(renderedHtml, event, state);
+    showTooltip(renderedHtml, event, state, idMappings, tokenId);
   }
 }
 
@@ -123,9 +130,18 @@ function createTooltip(): HTMLElement {
   return tooltip;
 }
 
-function showTooltip(html: string, event: MouseEvent, state: HoverHintState) {
+function showTooltip(
+  html: string,
+  event: MouseEvent,
+  state: HoverHintState,
+  idMappings: IdMappings,
+  tokenId: CodeTokenId,
+) {
   state.tooltip.innerHTML = html;
+
   positionTooltip(state.tooltip, event.target as HTMLElement);
+  styleTooltip(state.tooltip, idMappings, state, tokenId);
+
   state.tooltip.style.display = 'block';
 }
 
