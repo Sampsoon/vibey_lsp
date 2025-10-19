@@ -2,10 +2,8 @@ import { useState } from 'react';
 import { RadioOption } from './RadioOption';
 import { FormField } from './FormField';
 
-type ApiProvider = 'openrouter' | 'custom';
-
 export function ApiConfiguration() {
-  const [selectedProvider, setSelectedProvider] = useState<ApiProvider>('openrouter');
+  const [selectedProvider, setSelectedProvider] = useState<'openrouter' | 'custom'>('openrouter');
   const [openrouterKey, setOpenrouterKey] = useState('');
   const [customModel, setCustomModel] = useState('');
   const [customUrl, setCustomUrl] = useState('');

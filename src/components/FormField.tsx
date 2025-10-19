@@ -11,30 +11,23 @@ interface FormFieldProps {
   onChange?: (value: string) => void;
 }
 
-const styles = {
-  container: { marginBottom: '12px' },
-  label: (disabled?: boolean) => ({
-    ...typography.smallLabel,
-    display: 'block',
-    marginBottom: '6px',
-    color: disabled ? 'var(--text-disabled)' : 'var(--text-primary)',
-  }),
-  link: {
-    color: 'var(--link-color)',
-    textDecoration: 'none',
-  },
-  input: (disabled?: boolean) => ({
-    ...typography.smallLabel,
-    width: '100%',
-    padding: '8px 10px',
-    border: '1px solid var(--border-color)',
-    borderRadius: '4px',
-    backgroundColor: disabled ? 'transparent' : 'var(--input-bg)',
-    color: disabled ? 'var(--text-disabled)' : 'var(--text-primary)',
-    outline: 'none',
-    transition: 'all 0.2s',
-  }),
-};
+const labelStyle = (disabled?: boolean) => ({
+  ...typography.smallLabel,
+  display: 'block',
+  marginBottom: '6px',
+  color: disabled ? 'var(--text-disabled)' : 'var(--text-primary)',
+});
+
+const inputStyle = (disabled?: boolean) => ({
+  ...typography.smallLabel,
+  width: '100%',
+  padding: '8px 10px',
+  border: '1px solid var(--border-color)',
+  borderRadius: '4px',
+  backgroundColor: disabled ? 'transparent' : 'var(--input-bg)',
+  color: disabled ? 'var(--text-disabled)' : 'var(--text-primary)',
+  outline: 'none',
+});
 
 export function FormField({
   label,
@@ -47,13 +40,18 @@ export function FormField({
   onChange,
 }: FormFieldProps) {
   return (
-    <div style={styles.container}>
-      <label style={styles.label(disabled)}>
+    <div style={{ marginBottom: '12px' }}>
+      <label style={labelStyle(disabled)}>
         {label}
         {linkText && linkHref && (
           <>
             {' '}
-            <a href={linkHref} target="_blank" rel="noopener noreferrer" style={styles.link}>
+            <a
+              href={linkHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--link-color)', textDecoration: 'none' }}
+            >
               ({linkText})
             </a>
           </>
@@ -65,9 +63,7 @@ export function FormField({
         disabled={disabled}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
-        style={styles.input(disabled)}
-        onFocus={(e) => !disabled && (e.target.style.borderColor = 'var(--border-focus)')}
-        onBlur={(e) => (e.target.style.borderColor = 'var(--border-color)')}
+        style={inputStyle(disabled)}
       />
     </div>
   );
