@@ -6,6 +6,8 @@ export function WebsiteList() {
   const [filterMode, setFilterMode] = useState<'block-all' | 'allow-all'>('allow-all');
   const [regexes, setRegexes] = useState<string[]>([]);
   const [newRegex, setNewRegex] = useState('');
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editValue, setEditValue] = useState('');
 
   const addRegex = () => {
     if (newRegex.trim()) {
@@ -16,6 +18,26 @@ export function WebsiteList() {
 
   const removeRegex = (index: number) => {
     setRegexes(regexes.filter((_, i) => i !== index));
+  };
+
+  const startEditing = (index: number) => {
+    setEditingIndex(index);
+    setEditValue(regexes[index]);
+  };
+
+  const saveEdit = () => {
+    if (editingIndex !== null && editValue.trim()) {
+      const newRegexes = [...regexes];
+      newRegexes[editingIndex] = editValue.trim();
+      setRegexes(newRegexes);
+    }
+    setEditingIndex(null);
+    setEditValue('');
+  };
+
+  const cancelEdit = () => {
+    setEditingIndex(null);
+    setEditValue('');
   };
 
   const description =
@@ -37,23 +59,25 @@ export function WebsiteList() {
     flexDirection: 'column' as const,
     overflow: 'auto',
     flex: 1,
-    border: '1.5px solid var(--border-color)',
-    borderRadius: '12px',
+    border: '1px solid var(--border-color)',
+    borderRadius: '8px',
     backgroundColor: 'var(--card-bg-inactive)',
-    boxShadow: 'var(--shadow-md)',
+    boxShadow: 'var(--shadow-sm)',
   };
 
   const tableHeaderStyle = {
     display: 'flex',
     gap: '12px',
-    padding: '14px 8px',
-    borderBottom: '2px solid var(--border-color)',
-    backgroundColor: 'var(--bg-primary)',
+    padding: '12px 12px',
+    borderBottom: '1px solid var(--border-color)',
+    backgroundColor: 'var(--card-bg-inactive)',
     flexShrink: 0,
     alignItems: 'center',
     position: 'sticky' as const,
     top: 0,
     zIndex: 1,
+    borderTopLeftRadius: '8px',
+    borderTopRightRadius: '8px',
   };
 
   const tableBodyStyle = {
@@ -68,11 +92,11 @@ export function WebsiteList() {
   const tableRowStyle = {
     display: 'flex',
     gap: '12px',
-    padding: '12px 8px',
-    paddingLeft: '20px',
+    padding: '12px 12px',
     borderBottom: '1px solid var(--border-color)',
     alignItems: 'center',
     backgroundColor: 'var(--card-bg-inactive)',
+    transition: 'background-color 0.15s ease',
   };
 
   const cellStyle = {
@@ -84,6 +108,19 @@ export function WebsiteList() {
     textOverflow: 'ellipsis',
     flex: 1,
     color: 'var(--text-primary)',
+    cursor: 'pointer',
+  };
+
+  const editInputStyle = {
+    ...typography.smallLabel,
+    fontFamily: 'ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace',
+    flex: 1,
+    padding: '4px 8px',
+    border: '1.5px solid var(--primary-color)',
+    borderRadius: '4px',
+    backgroundColor: 'var(--input-bg)',
+    color: 'var(--text-primary)',
+    outline: 'none',
   };
 
   const emptyStateStyle = {
@@ -117,18 +154,60 @@ export function WebsiteList() {
         {regexes.length > 0 ? (
           <div style={tableBodyStyle}>
             {regexes.map((regex, index) => (
-              <div key={index} style={tableRowStyle}>
-                <div style={cellStyle} title={regex}>
-                  {regex}
-                </div>
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    removeRegex(index);
-                  }}
-                >
-                  <span style={{ fontSize: '1.5em', color: 'var(--alert-color)', fontWeight: 'bold' }}>✕</span>
-                </Button>
+              <div
+                key={index}
+                style={tableRowStyle}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--card-bg-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--card-bg-inactive)';
+                }}
+              >
+                {editingIndex === index ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => {
+                        setEditValue(e.target.value);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          saveEdit();
+                        } else if (e.key === 'Escape') {
+                          cancelEdit();
+                        }
+                      }}
+                      onBlur={saveEdit}
+                      autoFocus
+                      style={editInputStyle}
+                    />
+                    <Button variant="success" onClick={saveEdit}>
+                      <span style={{ fontSize: '1.5em' }}>✓</span>
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div
+                      style={cellStyle}
+                      title={regex}
+                      onClick={() => {
+                        startEditing(index);
+                      }}
+                    >
+                      {regex}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        removeRegex(index);
+                      }}
+                    >
+                      <span style={{ fontSize: '1.5em', color: 'var(--alert-color)', fontWeight: 'bold' }}>✕</span>
+                    </Button>
+                  </>
+                )}
               </div>
             ))}
           </div>
