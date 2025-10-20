@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { RadioOption } from './RadioOption';
 import { FormField } from './FormField';
+import { CodeExample } from './ui/CodeExample';
+import { DEFAULT_MODEL, DEFAULT_API_URL, DEFAULT_API_KEY } from './apiDefaults';
 
 export function ApiConfiguration() {
   const [selectedProvider, setSelectedProvider] = useState<'openrouter' | 'custom'>('openrouter');
@@ -22,7 +24,7 @@ export function ApiConfiguration() {
         <FormField
           label="API key"
           type="password"
-          placeholder="sk-or-v1-..."
+          placeholder="Your API key"
           linkText="click here to get one"
           linkHref="https://openrouter.ai/keys"
           value={openrouterKey}
@@ -38,21 +40,28 @@ export function ApiConfiguration() {
           setSelectedProvider('custom');
         }}
       >
-        <FormField label="Model" type="text" placeholder="gpt-4" value={customModel} onChange={setCustomModel} />
+        <FormField
+          label="Model"
+          type="text"
+          placeholder={DEFAULT_MODEL}
+          value={customModel}
+          onChange={setCustomModel}
+        />
         <FormField
           label="API URL"
           type="text"
-          placeholder="https://api.example.com/v1"
+          placeholder={DEFAULT_API_URL}
           value={customUrl}
           onChange={setCustomUrl}
         />
         <FormField
           label="API Key"
           type="password"
-          placeholder="Your API key"
+          placeholder={DEFAULT_API_KEY}
           value={customKey}
           onChange={setCustomKey}
         />
+        <CodeExample apiKey={customKey} baseURL={customUrl} model={customModel} />
       </RadioOption>
     </div>
   );
