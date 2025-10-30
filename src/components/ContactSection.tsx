@@ -28,13 +28,17 @@ const iconsWrapperStyle = {
 
 const linkStyle = {
   color: 'var(--text-primary)',
-  padding: '14px',
-  borderRadius: '10px',
-  boxShadow: 'var(--shadow-md)',
-  transition: 'all 0.2s ease',
+  padding: '12px',
+  backgroundColor: 'var(--card-bg-active)',
+  border: '1px solid var(--border-color)',
+  borderRadius: '12px',
+  boxShadow: 'var(--shadow-sm)',
+  transition: 'transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  width: '56px',
+  height: '56px',
   textDecoration: 'none',
 };
 

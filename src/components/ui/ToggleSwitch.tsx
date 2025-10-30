@@ -30,14 +30,19 @@ const sliderStyle = (isFirstSelected: boolean, isDragging: boolean) => ({
   // Ensure symmetrical spacing: inner gutters only, container padding handled by parent
   width: `calc(50% - ${(H_GAP_PX * 2).toString()}px)`,
   height: `calc(100% - ${(V_GAP_PX * 2).toString()}px)`,
-  backgroundColor: 'transparent',
-  borderRadius: '6px',
+  background: 'linear-gradient(180deg, rgba(107, 117, 201, 0.14) 0%, rgba(107, 117, 201, 0.10) 100%)',
+  border: '1px solid rgba(107, 117, 201, 0.35)',
+  borderRadius: '10px',
   transition: isDragging
     ? 'left 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-    : 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+    : 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, background 0.3s ease',
   top: `${V_GAP_PX.toString()}px`,
   left: isFirstSelected ? `${H_GAP_PX.toString()}px` : `calc(50% + ${H_GAP_PX.toString()}px)`,
-  boxShadow: 'var(--shadow-md)',
+  boxShadow: '0 8px 20px rgba(107, 117, 201, 0.18), 0 2px 4px rgba(47, 43, 72, 0.08)',
+  zIndex: 0,
+  pointerEvents: 'none' as const,
+  backdropFilter: 'saturate(120%) blur(2px)',
+  WebkitBackdropFilter: 'saturate(120%) blur(2px)',
 });
 
 const buttonStyle = (isSelected: boolean) => ({

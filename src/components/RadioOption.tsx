@@ -10,11 +10,17 @@ interface RadioOptionProps {
 }
 
 const containerStyle = (selected: boolean) => ({
-  border: '1px solid var(--border-color)',
-  borderRadius: '6px',
+  border: selected ? '1px solid rgba(107, 117, 201, 0.22)' : '1px solid var(--border-color)',
+  borderRadius: '10px',
   padding: '12px',
   marginBottom: '10px',
-  backgroundColor: selected ? 'var(--card-bg-active)' : 'var(--card-bg-inactive)',
+  background: selected
+    ? 'linear-gradient(180deg, rgba(107, 117, 201, 0.08) 0%, rgba(107, 117, 201, 0.04) 100%)'
+    : 'var(--card-bg-inactive)',
+  boxShadow: 'var(--shadow-sm)',
+  overflow: 'hidden',
+  backdropFilter: selected ? 'saturate(110%) blur(2px)' : undefined,
+  WebkitBackdropFilter: selected ? 'saturate(110%) blur(2px)' : undefined,
   opacity: selected ? 1 : 0.5,
   cursor: 'pointer',
 });

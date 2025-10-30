@@ -40,15 +40,18 @@ const sliderStyle = (index: number, isDragging: boolean) => ({
   position: 'absolute' as const,
   width: 'calc(100% - 16px)',
   height: '52px',
-  backgroundColor: 'var(--card-bg-inactive)',
-  borderRadius: '8px',
-  boxShadow: 'var(--shadow-md)',
+  background: 'linear-gradient(180deg, rgba(107, 117, 201, 0.14) 0%, rgba(107, 117, 201, 0.10) 100%)',
+  border: '1px solid rgba(107, 117, 201, 0.35)',
+  borderRadius: '10px',
+  boxShadow: '0 8px 20px rgba(107, 117, 201, 0.18), 0 2px 4px rgba(47, 43, 72, 0.08)',
   transition: isDragging
     ? 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-    : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, background 0.3s ease',
   transform: `translateY(${(index * 62 + 2).toString()}px)`,
   zIndex: 0,
   pointerEvents: 'none' as const,
+  backdropFilter: 'saturate(120%) blur(2px)',
+  WebkitBackdropFilter: 'saturate(120%) blur(2px)',
 });
 
 const buttonStyle = (isSelected: boolean) => ({

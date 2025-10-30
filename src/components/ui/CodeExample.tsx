@@ -18,7 +18,9 @@ export function CodeExample({ apiKey, baseURL, model }: CodeExampleProps) {
         marginBottom: '0px',
         padding: '0px',
         backgroundColor: 'var(--card-bg-active)',
-        borderRadius: '8px',
+        borderRadius: '10px',
+        border: '1px solid var(--border-color)',
+        boxShadow: 'none',
         overflowX: 'auto',
       }}
     >
@@ -26,8 +28,9 @@ export function CodeExample({ apiKey, baseURL, model }: CodeExampleProps) {
         style={{
           margin: 0,
           padding: '12px',
-          backgroundColor: 'var(--code-bg)',
-          borderRadius: '6px',
+          backgroundColor: 'var(--bg-primary)',
+          borderRadius: '8px',
+          border: '1px solid var(--border-color)',
           overflow: 'auto',
           fontSize: '12px',
           lineHeight: '1.4',

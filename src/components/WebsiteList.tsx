@@ -57,7 +57,7 @@ export function WebsiteList() {
   const tableContainerStyle = {
     display: 'flex',
     flexDirection: 'column' as const,
-    overflow: 'auto',
+    overflow: 'hidden',
     flex: 1,
     border: '1px solid var(--border-color)',
     borderRadius: '8px',
@@ -84,18 +84,18 @@ export function WebsiteList() {
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '0',
-    overflow: 'visible' as const,
+    overflowY: 'auto' as const,
+    overflowX: 'hidden' as const,
     flex: 1,
     minHeight: 0,
   };
 
   const tableRowStyle = {
     display: 'flex',
-    gap: '12px',
-    padding: '12px 12px',
+    gap: '10px',
+    padding: '8px 12px',
     borderBottom: '1px solid var(--border-color)',
     alignItems: 'center',
-    backgroundColor: 'var(--card-bg-inactive)',
     transition: 'background-color 0.15s ease',
   };
 
@@ -142,49 +142,32 @@ export function WebsiteList() {
         />
       </div>
 
-      <div style={tableContainerStyle} className="stable-scrollbar">
+      <div style={tableContainerStyle}>
         <div style={tableHeaderStyle}>
           <Input value={newRegex} onChange={setNewRegex} onSubmit={addRegex} placeholder="example\.com|test\.org" />
-          <Button variant="success" onClick={addRegex}>
-            <span style={{ fontSize: '1.5em' }}>✓</span>
-          </Button>
         </div>
         {regexes.length > 0 ? (
-          <div style={tableBodyStyle}>
+          <div style={tableBodyStyle} className="table-body">
             {regexes.map((regex, index) => (
-              <div
-                key={index}
-                style={tableRowStyle}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--card-bg-hover)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--card-bg-inactive)';
-                }}
-              >
+              <div key={index} style={tableRowStyle} className="table-row">
                 {editingIndex === index ? (
-                  <>
-                    <input
-                      type="text"
-                      value={editValue}
-                      onChange={(e) => {
-                        setEditValue(e.target.value);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          saveEdit();
-                        } else if (e.key === 'Escape') {
-                          cancelEdit();
-                        }
-                      }}
-                      onBlur={saveEdit}
-                      autoFocus
-                      style={editInputStyle}
-                    />
-                    <Button variant="success" onClick={saveEdit}>
-                      <span style={{ fontSize: '1.5em' }}>✓</span>
-                    </Button>
-                  </>
+                  <input
+                    type="text"
+                    value={editValue}
+                    onChange={(e) => {
+                      setEditValue(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        saveEdit();
+                      } else if (e.key === 'Escape') {
+                        cancelEdit();
+                      }
+                    }}
+                    onBlur={saveEdit}
+                    autoFocus
+                    style={editInputStyle}
+                  />
                 ) : (
                   <>
                     <div
@@ -197,12 +180,25 @@ export function WebsiteList() {
                       {regex}
                     </div>
                     <Button
-                      variant="ghost"
+                      variant="icon"
+                      size="sm"
                       onClick={() => {
                         removeRegex(index);
                       }}
                     >
-                      <span style={{ fontSize: '1.5em', color: 'var(--alert-color)', fontWeight: 'bold' }}>✕</span>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                      </svg>
                     </Button>
                   </>
                 )}

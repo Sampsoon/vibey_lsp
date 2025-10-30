@@ -22,11 +22,12 @@ const inputStyle = (disabled?: boolean) => ({
   ...typography.smallLabel,
   width: '100%',
   padding: '8px 10px',
-  border: '1px solid var(--border-color)',
-  borderRadius: '4px',
-  backgroundColor: disabled ? 'transparent' : 'var(--input-bg)',
+  border: disabled ? '1px solid var(--border-color)' : '1px solid rgba(107, 117, 201, 0.18)',
+  borderRadius: '8px',
+  backgroundColor: disabled ? 'transparent' : 'var(--bg-primary)',
   color: disabled ? 'var(--text-disabled)' : 'var(--text-primary)',
   outline: 'none',
+  boxShadow: disabled ? 'none' : 'inset 0 1px 1px rgba(47, 43, 72, 0.04)',
 });
 
 export function FormField({
