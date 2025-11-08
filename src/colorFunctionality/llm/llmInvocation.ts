@@ -2,19 +2,14 @@ import { OpenAI } from 'openai';
 import * as z from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { ChatCompletionCreateParams } from 'openai/resources.mjs';
-import { API_KEYS } from '../keys';
-
-const client = new OpenAI({
-  apiKey: API_KEYS.OPEN_ROUTER,
-  baseURL: 'https://openrouter.ai/api/v1',
-});
+import { getAPIKeyConfig, OPENROUTER_API_URL } from '../../storage';
 
 export interface LlmParams {
   prompt: string;
   schema: z.ZodSchema;
 }
 
-type OpenRouterChatCompletionCreateParams = ChatCompletionCreateParams & {
+interface OpenRouterChatCompletionCreateParams {
   provider?: {
     sort?: string;
     require_parameters?: boolean;
@@ -25,9 +20,13 @@ type OpenRouterChatCompletionCreateParams = ChatCompletionCreateParams & {
     exclude?: boolean;
     enabled?: boolean;
   };
-};
+}
 
-async function invokeOpenRouterClient(params: OpenRouterChatCompletionCreateParams, onChunk: (chunk: string) => void) {
+async function invokeOpenRouterClient(
+  client: OpenAI,
+  params: OpenRouterChatCompletionCreateParams & ChatCompletionCreateParams,
+  onChunk: (chunk: string) => void,
+) {
   const response = await client.chat.completions.create({
     ...params,
     stream: true,
@@ -42,18 +41,23 @@ async function invokeOpenRouterClient(params: OpenRouterChatCompletionCreatePara
   }
 }
 
-export async function callLLMViaOpenRouter(
-  model: string,
-  input: string,
-  llmParams: LlmParams,
-  onChunk: (chunk: string) => void,
-) {
+export async function callLLM(input: string, llmParams: LlmParams, onChunk: (chunk: string) => void) {
   const { prompt, schema } = llmParams;
 
   const jsonSchema = zodToJsonSchema(schema);
 
-  const params: OpenRouterChatCompletionCreateParams = {
-    model,
+  const apiKeyConfig = await getAPIKeyConfig();
+
+  if (!apiKeyConfig) {
+    throw new Error('No API configuration found');
+  }
+
+  const client = new OpenAI({
+    apiKey: apiKeyConfig.key,
+    baseURL: apiKeyConfig.url,
+  });
+
+  const openRouterParams: OpenRouterChatCompletionCreateParams = {
     provider: {
       sort: 'throughput',
       require_parameters: true,
@@ -63,6 +67,10 @@ export async function callLLMViaOpenRouter(
       effort: 'low',
       enabled: false,
     },
+  };
+
+  const params: ChatCompletionCreateParams = {
+    model: apiKeyConfig.model,
     messages: [
       {
         role: 'system',
@@ -83,5 +91,7 @@ export async function callLLMViaOpenRouter(
     },
   };
 
-  await invokeOpenRouterClient(params, onChunk);
+  const allParams = apiKeyConfig.url === OPENROUTER_API_URL ? { ...openRouterParams, ...params } : params;
+
+  await invokeOpenRouterClient(client, allParams, onChunk);
 }

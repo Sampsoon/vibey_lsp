@@ -44,6 +44,7 @@ The following design is for a Chrome extension that will identify code blocks in
 * Have ability to select local LLMs
 * Have toggle to add button to code blocks that when clicked generates suggestions
 * Keep popup on screen when user moves mouse over it
+* have ability to add custom key value pairs with custom endpoint
 
 ### UI
 * Have ability for users to select permissions of chrome extension during setup 

@@ -22,5 +22,5 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["scripting"]
+  "permissions": ["scripting", "storage"]
 }

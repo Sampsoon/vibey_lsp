@@ -3,7 +3,7 @@ import { RadioOption } from './RadioOption';
 import { Input } from './Input';
 import { PasswordInput } from './PasswordInput';
 import { CodeExample } from './CodeExample';
-import { DEFAULT_MODEL, DEFAULT_API_URL } from '../../apiDefaults';
+import { DEFAULT_MODEL, OPENROUTER_API_URL } from '../../storage';
 import { fieldLabelStyle } from './styles';
 
 export function ApiConfiguration() {
@@ -72,7 +72,7 @@ export function ApiConfiguration() {
           <label style={fieldLabelStyle}>API URL</label>
           <Input
             type="text"
-            placeholder={DEFAULT_API_URL}
+            placeholder={OPENROUTER_API_URL}
             value={customUrl}
             onChange={(val: string) => {
               setCustomUrl(val);
