@@ -1,4 +1,4 @@
-import { saveAPIKeyConfigToStorage, getAPIKeyConfigFromStorage } from './storage';
+import { saveAPIKeyConfigToStorage, getAPIKeyConfigFromStorage, deleteAPIKeyConfigFromStorage } from './storage';
 import { isOpenRouterAPIConfig, isFullAPIConfig, FullAPIConfig, ApiKeyConfig } from './types';
 
 export const DEFAULT_MODEL = 'x-ai/grok-4-fast';
@@ -36,4 +36,8 @@ export async function getAPIKeyConfig(): Promise<FullAPIConfig | undefined> {
   }
 
   return undefined;
+}
+
+export async function deleteAPIKeyConfig(): Promise<void> {
+  await deleteAPIKeyConfigFromStorage();
 }

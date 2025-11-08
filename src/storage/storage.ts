@@ -13,3 +13,7 @@ export async function getAPIKeyConfigFromStorage(): Promise<ApiKeyConfig | undef
 export async function saveAPIKeyConfigToStorage(config: ApiKeyConfig) {
   await browser.storage.local.set({ [STORAGE_KEY.API_KEY_CONFIG]: config });
 }
+
+export async function deleteAPIKeyConfigFromStorage() {
+  await browser.storage.local.remove(STORAGE_KEY.API_KEY_CONFIG);
+}

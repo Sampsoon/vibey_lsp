@@ -1,1 +1,1 @@
-export { saveAPIKeyConfig, getAPIKeyConfig, DEFAULT_MODEL, OPENROUTER_API_URL } from './apiKeys';
+export { saveAPIKeyConfig, getAPIKeyConfig, deleteAPIKeyConfig, DEFAULT_MODEL, OPENROUTER_API_URL } from './apiKeys';

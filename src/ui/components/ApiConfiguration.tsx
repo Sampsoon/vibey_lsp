@@ -1,10 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { RadioOption } from './RadioOption';
 import { Input } from './Input';
 import { PasswordInput } from './PasswordInput';
 import { CodeExample } from './CodeExample';
-import { DEFAULT_MODEL, OPENROUTER_API_URL } from '../../storage';
+import { DEFAULT_MODEL, OPENROUTER_API_URL, deleteAPIKeyConfig, saveAPIKeyConfig } from '../../storage';
 import { fieldLabelStyle } from './styles';
+
+async function processOpenRouterConfigChange(openrouterKey: string) {
+  if (!openrouterKey) {
+    await deleteAPIKeyConfig();
+    return;
+  }
+
+  await saveAPIKeyConfig({
+    key: openrouterKey,
+  });
+}
+
+async function processCustomConfigChange(customModel: string, customUrl: string, customKey: string) {
+  if (!customModel || !customUrl || !customKey) {
+    await deleteAPIKeyConfig();
+    return;
+  }
+
+  await saveAPIKeyConfig({
+    model: customModel,
+    url: customUrl,
+    key: customKey,
+  });
+}
 
 export function ApiConfiguration() {
   const [selectedProvider, setSelectedProvider] = useState<'openrouter' | 'custom'>('openrouter');
@@ -16,6 +40,22 @@ export function ApiConfiguration() {
   const [customKey, setCustomKey] = useState('');
 
   const [showCustomKey, setShowCustomKey] = useState(false);
+
+  const debounceTimeout = 500;
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (selectedProvider === 'openrouter') {
+        void processOpenRouterConfigChange(openrouterKey);
+      } else {
+        void processCustomConfigChange(customModel, customUrl, customKey);
+      }
+    }, debounceTimeout);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [openrouterKey, customModel, customUrl, customKey, selectedProvider]);
 
   return (
     <div>
