@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { baseSliderStyle } from './styles';
+import { baseSliderStyle } from '../common';
 
 type Tab = 'api' | 'websites' | 'contact';
 

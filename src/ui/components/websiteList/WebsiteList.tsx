@@ -1,8 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ToggleSwitch } from './ToggleSwitch';
-import { Input } from './Input';
-import { IconButton } from './IconButton';
-import { bodyTextStyle } from './styles';
+import { ToggleSwitch, Input, IconButton, bodyTextStyle } from '../common';
 
 export function WebsiteList() {
   const [filterMode, setFilterMode] = useState<'block-all' | 'allow-all'>('allow-all');

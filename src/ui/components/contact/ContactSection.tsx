@@ -1,4 +1,4 @@
-import { smallLabelTextStyle } from './styles';
+import { smallLabelTextStyle } from '../common';
 
 const links = [
   {

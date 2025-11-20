@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import browser from 'webextension-polyfill';
-import { RadioOption } from './RadioOption';
-import { PasswordInput } from './PasswordInput';
-import { Button } from './Button';
-import { storage, APIProvider } from '../../storage';
-import { fieldLabelStyle } from './styles';
-import { createDebounce } from '../utils';
+import { RadioOption, PasswordInput, Button, fieldLabelStyle } from '../common';
+import { storage, APIProvider } from '../../../storage';
+import { createDebounce } from '../../utils';
 
 const OPEN_ROUTER_API_KEY_URL = 'https://openrouter.ai/keys';
 

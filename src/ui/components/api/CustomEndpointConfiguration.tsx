@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Input } from './Input';
-import { PasswordInput } from './PasswordInput';
+import { Input, PasswordInput, fieldLabelStyle } from '../common';
 import { CodeExample } from './CodeExample';
-import { DEFAULT_MODEL, OPEN_ROUTER_API_URL, storage } from '../../storage';
-import { fieldLabelStyle } from './styles';
-import { createDebounce } from '../utils';
+import { DEFAULT_MODEL, OPEN_ROUTER_API_URL, storage } from '../../../storage';
+import { createDebounce } from '../../utils';
 
 async function processCustomConfigChange(customModel: string, customUrl: string, customKey: string) {
   await storage.customApiConfig.set({

@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL, OPEN_ROUTER_API_URL } from '../../storage';
+import { DEFAULT_MODEL, OPEN_ROUTER_API_URL } from '../../../storage';
 
 interface CodeExampleProps {
   apiKey: string;

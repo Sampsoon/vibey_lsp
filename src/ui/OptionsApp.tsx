@@ -1,4 +1,4 @@
-import { CustomEndpointConfiguration } from './components/CustomEndpointConfiguration';
+import { CustomEndpointConfiguration } from './components';
 
 function OptionsApp() {
   return (
