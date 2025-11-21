@@ -5,3 +5,4 @@ export * from './PasswordInput';
 export * from './RadioOption';
 export * from './ToggleSwitch';
 export * from './styles';
+export * from './TextArea';

@@ -1,8 +1,10 @@
+import { Json } from '../shared';
+
 export interface CustomAPIConfig {
   model: string;
   url: string;
   key: string;
-  additionalArguments?: Record<string, unknown>;
+  additionalArguments?: Json;
 }
 
 export interface OpenRouterAPIConfig {
