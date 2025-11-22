@@ -123,6 +123,11 @@ body {
   padding: 0;
 }
 
+h1 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
 * {
   box-sizing: border-box;
 }
