@@ -50,9 +50,10 @@ export function CustomEndpointConfiguration() {
         setCustomModel(customApiConfig.model);
         setCustomUrl(customApiConfig.url);
         setCustomKey(customApiConfig.key);
-        const loadedArguments = customApiConfig.additionalArguments ?? {};
-        setCustomArguments(loadedArguments);
-        setArgumentsString(formatJson(loadedArguments));
+
+        const additionalArguments = customApiConfig.additionalArguments ?? {};
+        setCustomArguments(additionalArguments);
+        setArgumentsString(formatJson(additionalArguments));
       }
     };
     void loadConfig();
@@ -64,13 +65,18 @@ export function CustomEndpointConfiguration() {
 
   const handleArgumentsChange = (value: string) => {
     const parsed = parseJsonOrUndefined(value);
-    if (parsed) {
-      setCustomArguments(parsed);
-      setArgumentsString(formatJson(parsed));
+
+    if (!parsed) {
+      setCustomArguments({});
+      setArgumentsString(value);
       return;
     }
 
-    setArgumentsString(value);
+    setCustomArguments(parsed);
+
+    // The check for the number of keys is necessary because we don't want to auto format an empty object as
+    // this will result in the string "{}".
+    setArgumentsString(Object.keys(parsed).length > 0 ? formatJson(parsed) : value);
   };
 
   return (
