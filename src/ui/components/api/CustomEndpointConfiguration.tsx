@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Input, PasswordInput, fieldLabelStyle, TextArea, AlertIcon } from '../common';
-import { CodeExample } from './CodeExample';
+import { ApiPreview } from './ApiPreview';
 import { DEFAULT_MODEL, OPEN_ROUTER_API_URL, storage } from '../../../storage';
 import { createDebounce } from '../../utils';
 import { Json } from '../../../shared';
@@ -141,7 +141,7 @@ export function CustomEndpointConfiguration() {
           </div>
         )}
       </div>
-      <CodeExample
+      <ApiPreview
         apiKey={showCustomKey ? customKey : customKey ? '•'.repeat(customKey.length) : ''}
         baseURL={customUrl}
         model={customModel}
