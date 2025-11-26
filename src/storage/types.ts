@@ -19,3 +19,11 @@ export enum APIProvider {
 }
 
 export type SettingsTab = 'api' | 'websites' | 'contact';
+
+export type WebsiteFilterMode = 'block-all' | 'allow-all';
+
+export interface WebsiteFilterConfig {
+  mode: WebsiteFilterMode;
+  blockList: string[];
+  allowList: string[];
+}

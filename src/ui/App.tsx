@@ -11,10 +11,11 @@ function App() {
       if (tab) {
         setSelectedTab(tab);
       }
-
-      setTimeout(() => {
-        setAnimate(true);
-      }, 0);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setAnimate(true);
+        });
+      });
     });
   }, []);
 

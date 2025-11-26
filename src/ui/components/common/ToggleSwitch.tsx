@@ -6,6 +6,7 @@ interface ToggleSwitchProps<T extends string> {
   onChange: (value: T) => void;
   options: readonly [T, T];
   labels: readonly [string, string];
+  animate?: boolean;
 }
 
 const PADDING_PX = 8;
@@ -32,12 +33,12 @@ const containerStyle = (isDragging: boolean) => ({
   cursor: isDragging ? 'grabbing' : 'grab',
 });
 
-const sliderStyle = (isFirstSelected: boolean, isDragging: boolean) => ({
+const sliderStyle = (isFirstSelected: boolean, isDragging: boolean, animate: boolean) => ({
   ...baseSliderStyle,
   width: `calc(50% - ${(H_GAP_PX * 2).toString()}px)`,
   height: `calc(100% - ${(V_GAP_PX * 2).toString()}px)`,
   top: `${V_GAP_PX.toString()}px`,
-  transition: isDragging ? TRANSITION_DRAGGING_LEFT : TRANSITION_NORMAL_LEFT,
+  transition: animate ? (isDragging ? TRANSITION_DRAGGING_LEFT : TRANSITION_NORMAL_LEFT) : 'none',
   left: isFirstSelected ? `${H_GAP_PX.toString()}px` : `calc(50% + ${H_GAP_PX.toString()}px)`,
 });
 
@@ -57,7 +58,13 @@ const buttonStyle = (isSelected: boolean) => ({
   color: isSelected ? 'var(--primary-color)' : 'var(--text-secondary)',
 });
 
-export function ToggleSwitch<T extends string>({ value, onChange, options, labels }: ToggleSwitchProps<T>) {
+export function ToggleSwitch<T extends string>({
+  value,
+  onChange,
+  options,
+  labels,
+  animate = true,
+}: ToggleSwitchProps<T>) {
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -112,7 +119,7 @@ export function ToggleSwitch<T extends string>({ value, onChange, options, label
 
   return (
     <div ref={containerRef} style={containerStyle(isDragging)} onMouseDown={handleMouseDown}>
-      <div style={sliderStyle(value === options[0], isDragging)} />
+      <div style={sliderStyle(value === options[0], isDragging, animate)} />
       {options.map((option, index) => (
         <button
           key={option}

@@ -1,25 +1,67 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ToggleSwitch, Input, IconButton, bodyTextStyle, TrashIcon } from '../common';
+import { storage, WebsiteFilterMode } from '../../../storage';
 
 export function WebsiteList() {
-  const [filterMode, setFilterMode] = useState<'block-all' | 'allow-all'>('allow-all');
-  const [regexes, setRegexes] = useState<string[]>([]);
+  const [filterMode, setFilterMode] = useState<WebsiteFilterMode>('allow-all');
+  const [blockList, setBlockList] = useState<string[]>([]);
+  const [allowList, setAllowList] = useState<string[]>([]);
   const [newRegex, setNewRegex] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [animate, setAnimate] = useState(false);
+
+  const regexes = filterMode === 'allow-all' ? blockList : allowList;
+  const setRegexes = filterMode === 'allow-all' ? setBlockList : setAllowList;
+
+  useEffect(() => {
+    void storage.websiteFilter.get().then((config) => {
+      if (config) {
+        setFilterMode(config.mode);
+        setBlockList(config.blockList);
+        setAllowList(config.allowList);
+      }
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setAnimate(true);
+        });
+      });
+    });
+  }, []);
+
+  const updateRegexes = useCallback(
+    (newRegexes: string[]) => {
+      setRegexes(newRegexes);
+      void storage.websiteFilter.set(
+        filterMode === 'allow-all'
+          ? { mode: filterMode, blockList: newRegexes, allowList }
+          : { mode: filterMode, blockList, allowList: newRegexes },
+      );
+    },
+    [setRegexes, filterMode, blockList, allowList],
+  );
+
+  const handleFilterModeChange = useCallback(
+    (mode: WebsiteFilterMode) => {
+      setFilterMode(mode);
+      void storage.websiteFilter.set({ mode, blockList, allowList });
+    },
+    [blockList, allowList],
+  );
 
   const addRegex = useCallback(() => {
     if (newRegex.trim()) {
-      setRegexes([newRegex.trim(), ...regexes]);
+      updateRegexes([newRegex.trim(), ...regexes]);
       setNewRegex('');
     }
-  }, [newRegex, regexes]);
+  }, [newRegex, regexes, updateRegexes]);
 
   const removeRegex = useCallback(
     (index: number) => {
-      setRegexes(regexes.filter((_, i) => i !== index));
+      updateRegexes(regexes.filter((_, i) => i !== index));
     },
-    [regexes],
+    [regexes, updateRegexes],
   );
 
   const startEditing = useCallback(
@@ -34,11 +76,11 @@ export function WebsiteList() {
     if (editingIndex !== null && editValue.trim()) {
       const newRegexes = [...regexes];
       newRegexes[editingIndex] = editValue.trim();
-      setRegexes(newRegexes);
+      updateRegexes(newRegexes);
     }
     setEditingIndex(null);
     setEditValue('');
-  }, [editingIndex, editValue, regexes]);
+  }, [editingIndex, editValue, regexes, updateRegexes]);
 
   const cancelEdit = useCallback(() => {
     setEditingIndex(null);
@@ -156,9 +198,10 @@ export function WebsiteList() {
       <div style={{ marginBottom: '4px' }}>
         <ToggleSwitch
           value={filterMode}
-          onChange={setFilterMode}
+          onChange={handleFilterModeChange}
           options={['allow-all', 'block-all']}
           labels={['Run on all websites', 'Block all websites']}
+          animate={animate}
         />
       </div>
 

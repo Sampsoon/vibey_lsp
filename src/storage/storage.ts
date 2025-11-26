@@ -1,4 +1,4 @@
-import { CustomAPIConfig, APIProvider, OpenRouterAPIConfig, SettingsTab } from './types';
+import { CustomAPIConfig, APIProvider, OpenRouterAPIConfig, SettingsTab, WebsiteFilterConfig } from './types';
 import browser from 'webextension-polyfill';
 
 function createStorageAccessors<T>(key: string) {
@@ -21,4 +21,5 @@ export const storage = {
   customApiConfig: createStorageAccessors<CustomAPIConfig>('customApiConfig'),
   apiProvider: createStorageAccessors<APIProvider>('apiProvider'),
   selectedTab: createStorageAccessors<SettingsTab>('selectedTab'),
+  websiteFilter: createStorageAccessors<WebsiteFilterConfig>('websiteFilter'),
 } as const;
