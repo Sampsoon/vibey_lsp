@@ -6,6 +6,7 @@ type Tab = 'api' | 'websites' | 'contact';
 interface SettingsMenuProps {
   selected: Tab;
   onSelect: (tab: Tab) => void;
+  animate: boolean;
 }
 
 const ITEM_HEIGHT = 62;
@@ -47,11 +48,11 @@ const containerStyle = (isDragging: boolean) => ({
   cursor: isDragging ? 'grabbing' : 'grab',
 });
 
-const sliderStyle = (index: number, isDragging: boolean) => ({
+const sliderStyle = (index: number, isDragging: boolean, animate: boolean) => ({
   ...baseSliderStyle,
   width: `calc(100% - ${BORDER_WIDTH.toString()}px)`,
   height: `${BUTTON_HEIGHT.toString()}px`,
-  transition: isDragging ? 'var(--transition-dragging)' : 'var(--transition-normal)',
+  transition: animate ? (isDragging ? 'var(--transition-dragging)' : 'var(--transition-normal)') : 'none',
   transform: `translateY(${(index * ITEM_HEIGHT + SLIDER_OFFSET).toString()}px)`,
 });
 
@@ -70,7 +71,7 @@ const buttonStyle = (isSelected: boolean) => ({
   color: isSelected ? 'var(--primary-color)' : 'var(--text-secondary)',
 });
 
-export function SettingsMenu({ selected, onSelect }: SettingsMenuProps) {
+export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps) {
   const selectedIndex = tabs.findIndex((tab) => tab.id === selected);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -126,7 +127,7 @@ export function SettingsMenu({ selected, onSelect }: SettingsMenuProps) {
 
   return (
     <div ref={containerRef} style={containerStyle(isDragging)} onMouseDown={handleMouseDown}>
-      <div style={sliderStyle(selectedIndex, isDragging)} />
+      <div style={sliderStyle(selectedIndex, isDragging, animate)} />
       {tabs.map(({ id, title, icon: Icon }) => (
         <button
           key={id}

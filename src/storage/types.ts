@@ -17,3 +17,5 @@ export enum APIProvider {
   OPEN_ROUTER = 'OpenRouter',
   CUSTOM = 'Custom',
 }
+
+export type SettingsTab = 'api' | 'websites' | 'contact';
