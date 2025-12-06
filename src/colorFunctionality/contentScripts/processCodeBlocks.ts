@@ -15,23 +15,12 @@ import {
 } from '../htmlProcessing';
 import { attachHoverHint, setupHoverHintState, setupHoverHintTriggers } from '../hoverHints';
 import { invokeHoverHintRetrievalServiceWorker, listenForHoverHintsFromServiceWorker } from '../serviceWorker';
-import { storage, WebsiteFilterMode } from '../../storage';
 
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_MUTATIONS_STABLE = 800;
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE = 1000;
 
 const SMALLEST_SCREEN_DIMENSION = Math.min(window.innerWidth, window.innerHeight);
 const ROOT_MARGIN_PERCENTAGE = 0.25;
-
-function shouldRunOnCurrentSite(mode: WebsiteFilterMode, blockList: string[], allowList: string[]): boolean {
-  const currentUrl = window.location.href;
-
-  if (mode === WebsiteFilterMode.ALLOW_ALL) {
-    return !blockList.some((pattern) => new RegExp(pattern).test(currentUrl));
-  } else {
-    return allowList.some((pattern) => new RegExp(pattern).test(currentUrl));
-  }
-}
 
 function generateHoverhintsForCodeBlock(codeBlock: CodeBlock, idMappings: IdMappings) {
   console.log('Retrieving annotations for code block:', codeBlock.codeBlockId);
@@ -175,13 +164,7 @@ function setupMutationObserver(
   return mutationObserver;
 }
 
-async function main() {
-  const { mode, blockList, allowList } = await storage.websiteFilter.get();
-
-  if (!shouldRunOnCurrentSite(mode, blockList, allowList)) {
-    return;
-  }
-
+function main() {
   const { codeBlockTrackingState, codeBlockProcessingObserver, idMappings } = setup();
 
   window.addEventListener('load', () => {
@@ -193,4 +176,4 @@ async function main() {
   setupMutationObserver(codeBlockTrackingState, codeBlockProcessingObserver, idMappings);
 }
 
-void main();
+main();

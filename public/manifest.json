@@ -15,16 +15,11 @@
     "service_worker": "src/colorFunctionality/serviceWorker/serviceWorker.ts",
     "type": "module"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["src/colorFunctionality/contentScripts/processCodeBlocks.ts"]
-    }
-  ],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["scripting", "storage"]
+  "permissions": ["scripting", "storage"],
+  "optional_host_permissions": ["<all_urls>"]
 }

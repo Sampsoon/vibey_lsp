@@ -32,7 +32,7 @@ export interface WebsiteFilterConfig {
 }
 
 export const DEFAULT_WEBSITE_FILTER_CONFIG: WebsiteFilterConfig = {
-  mode: WebsiteFilterMode.ALLOW_ALL,
+  mode: WebsiteFilterMode.BLOCK_ALL,
   blockList: [],
   allowList: [],
 };

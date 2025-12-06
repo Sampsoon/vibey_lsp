@@ -1,18 +1,32 @@
 import { useState, useCallback, useEffect } from 'react';
 import { ToggleSwitch, Input, IconButton, bodyTextStyle, TrashIcon } from '../common';
 import { storage, WebsiteFilterMode } from '../../../storage';
+import { getMatchConfigFromWebsiteFilter, requestPermissionsForMatchConfig } from '../../../permissions';
+import browser from 'webextension-polyfill';
+
+async function isValidatePattern(pattern: string): Promise<boolean> {
+  try {
+    await browser.permissions.contains({ origins: [pattern] });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export function WebsiteList() {
   const [filterMode, setFilterMode] = useState<WebsiteFilterMode>(WebsiteFilterMode.ALLOW_ALL);
   const [blockList, setBlockList] = useState<string[]>([]);
   const [allowList, setAllowList] = useState<string[]>([]);
-  const [newRegex, setNewRegex] = useState('');
+
+  const [newPattern, setNewPattern] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
   const [animate, setAnimate] = useState(false);
 
-  const regexes = filterMode === WebsiteFilterMode.ALLOW_ALL ? blockList : allowList;
-  const setRegexes = filterMode === WebsiteFilterMode.ALLOW_ALL ? setBlockList : setAllowList;
+  const [error, setError] = useState<string | null>(null);
+
+  const patterns = filterMode === WebsiteFilterMode.ALLOW_ALL ? blockList : allowList;
+  const setPatterns = filterMode === WebsiteFilterMode.ALLOW_ALL ? setBlockList : setAllowList;
 
   useEffect(() => {
     void storage.websiteFilter.get().then(({ mode, blockList, allowList }) => {
@@ -27,57 +41,72 @@ export function WebsiteList() {
     });
   }, []);
 
-  const updateRegexes = useCallback(
-    (newRegexes: string[]) => {
-      setRegexes(newRegexes);
-      void storage.websiteFilter.set(
+  const updatePatterns = useCallback(
+    (newPatterns: string[]) => {
+      setPatterns(newPatterns);
+      const config =
         filterMode === WebsiteFilterMode.ALLOW_ALL
-          ? { mode: filterMode, blockList: newRegexes, allowList }
-          : { mode: filterMode, blockList, allowList: newRegexes },
-      );
+          ? { mode: filterMode, blockList: newPatterns, allowList }
+          : { mode: filterMode, blockList, allowList: newPatterns };
+      const matchConfig = getMatchConfigFromWebsiteFilter(config);
+      void requestPermissionsForMatchConfig(matchConfig);
+      void storage.websiteFilter.set(config);
     },
-    [setRegexes, filterMode, blockList, allowList],
+    [setPatterns, filterMode, blockList, allowList],
   );
 
   const handleFilterModeChange = useCallback(
     (mode: WebsiteFilterMode) => {
       setFilterMode(mode);
-      void storage.websiteFilter.set({ mode, blockList, allowList });
+      const config = { mode, blockList, allowList };
+      const matchConfig = getMatchConfigFromWebsiteFilter(config);
+      void requestPermissionsForMatchConfig(matchConfig);
+      void storage.websiteFilter.set(config);
     },
     [blockList, allowList],
   );
 
-  const addRegex = useCallback(() => {
-    if (newRegex.trim()) {
-      updateRegexes([newRegex.trim(), ...regexes]);
-      setNewRegex('');
+  const addPattern = useCallback(async () => {
+    const trimmed = newPattern.trim();
+    if (!trimmed) {
+      return;
     }
-  }, [newRegex, regexes, updateRegexes]);
 
-  const removeRegex = useCallback(
+    const validPattern = await isValidatePattern(trimmed);
+    if (validPattern) {
+      setError('Invalid pattern');
+      return;
+    }
+
+    setError(null);
+    updatePatterns([trimmed, ...patterns]);
+    setNewPattern('');
+  }, [newPattern, patterns, updatePatterns]);
+
+  const removePattern = useCallback(
     (index: number) => {
-      updateRegexes(regexes.filter((_, i) => i !== index));
+      updatePatterns(patterns.filter((_, i) => i !== index));
     },
-    [regexes, updateRegexes],
+    [patterns, updatePatterns],
   );
 
   const startEditing = useCallback(
     (index: number) => {
       setEditingIndex(index);
-      setEditValue(regexes[index]);
+      setEditValue(patterns[index]);
     },
-    [regexes],
+    [patterns],
   );
 
   const saveEdit = useCallback(() => {
     if (editingIndex !== null && editValue.trim()) {
-      const newRegexes = [...regexes];
-      newRegexes[editingIndex] = editValue.trim();
-      updateRegexes(newRegexes);
+      const newPatterns = [...patterns];
+      newPatterns[editingIndex] = editValue.trim();
+      updatePatterns(newPatterns);
     }
     setEditingIndex(null);
     setEditValue('');
-  }, [editingIndex, editValue, regexes, updateRegexes]);
+  }, [editingIndex, editValue, patterns, updatePatterns]);
 
   const cancelEdit = useCallback(() => {
     setEditingIndex(null);
@@ -86,8 +115,13 @@ export function WebsiteList() {
 
   const emptyStateMessage =
     filterMode === WebsiteFilterMode.BLOCK_ALL
-      ? 'Add regex patterns to allow specific sites while blocking all others'
-      : 'Add regex patterns to block specific sites while allowing all others';
+      ? 'Add URL patterns to allow specific sites'
+      : 'Add URL patterns to block specific sites';
+
+  const permissionNote =
+    filterMode === WebsiteFilterMode.ALLOW_ALL
+      ? 'This extension won\'t run on blocked sites, but due to Chrome API restrictions, it still has access to blocked sites. Use "Block all websites" to limit Chrome permissions to only the sites you choose.'
+      : null;
 
   const handleEditKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -190,6 +224,23 @@ export function WebsiteList() {
     fontStyle: 'italic',
   };
 
+  const permissionNoteStyle = {
+    ...bodyTextStyle,
+    padding: '12px 16px',
+    textAlign: 'center' as const,
+    color: 'var(--text-secondary)',
+    fontSize: '12px',
+    borderTop: '1px solid var(--border-color)',
+  };
+
+  const errorStyle = {
+    padding: '8px 12px',
+    color: 'var(--error-color, #ef4444)',
+    fontSize: '12px',
+    backgroundColor: 'var(--error-bg, rgba(239, 68, 68, 0.1))',
+    borderBottom: '1px solid var(--border-color)',
+  };
+
   return (
     <div style={containerStyle}>
       <div style={{ marginBottom: '4px' }}>
@@ -204,11 +255,22 @@ export function WebsiteList() {
 
       <div style={tableContainerStyle}>
         <div style={tableHeaderStyle}>
-          <Input value={newRegex} onChange={setNewRegex} onSubmit={addRegex} placeholder="example\.com|test\.org" />
+          <Input
+            value={newPattern}
+            onChange={(value) => {
+              setNewPattern(value);
+              setError(null);
+            }}
+            onSubmit={() => {
+              void addPattern();
+            }}
+            placeholder="*://*.example.com/*"
+          />
         </div>
-        {regexes.length > 0 ? (
+        {error && <div style={errorStyle}>{error}</div>}
+        {patterns.length > 0 ? (
           <div style={tableBodyStyle} className="table-body">
-            {regexes.map((regex, index) => (
+            {patterns.map((pattern, index) => (
               <div key={index} style={tableRowStyle} className="table-row">
                 {editingIndex === index ? (
                   <input
@@ -226,16 +288,16 @@ export function WebsiteList() {
                   <>
                     <div
                       style={cellStyle}
-                      title={regex}
+                      title={pattern}
                       onClick={() => {
                         startEditing(index);
                       }}
                     >
-                      {regex}
+                      {pattern}
                     </div>
                     <IconButton
                       onClick={() => {
-                        removeRegex(index);
+                        removePattern(index);
                       }}
                     >
                       <TrashIcon />
@@ -247,6 +309,11 @@ export function WebsiteList() {
           </div>
         ) : (
           <div style={emptyStateStyle}>{emptyStateMessage}</div>
+        )}
+        {permissionNote && (
+          <div style={permissionNoteStyle}>
+            <strong>Note:</strong> {permissionNote.replace('Note: ', '')}
+          </div>
         )}
       </div>
     </div>

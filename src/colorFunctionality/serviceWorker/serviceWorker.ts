@@ -1,6 +1,18 @@
 import browser from 'webextension-polyfill';
 import { isHoverHintRetrievalMessage, isServiceWorkerMessage } from './interface';
 import handleHoverHintRetrievalMessages from './handleHoverHintRetrievalMessages';
+import { registerProcessCodeBlocksScript } from './processCodeBlocksRegistration';
+import { getMatchConfigFromWebsiteFilter } from '../../permissions';
+import { storage } from '../../storage';
+
+const config = await storage.websiteFilter.get();
+const matchConfig = getMatchConfigFromWebsiteFilter(config);
+await registerProcessCodeBlocksScript(matchConfig);
+
+storage.websiteFilter.onChange((newConfig) => {
+  const matchConfig = getMatchConfigFromWebsiteFilter(newConfig);
+  void registerProcessCodeBlocksScript(matchConfig);
+});
 
 function validateSender(sender: browser.Runtime.MessageSender): boolean {
   if (!sender.tab) {

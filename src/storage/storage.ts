@@ -8,10 +8,13 @@ import {
 } from './types';
 import browser from 'webextension-polyfill';
 
+type OnChangeCallback<T> = (newValue: T, oldValue: T | undefined) => void;
+
 function createStorageAccessors<T>(key: string): {
   get: () => Promise<T | undefined>;
   set: (value: T) => Promise<void>;
   remove: () => Promise<void>;
+  onChange: (callback: OnChangeCallback<T | undefined>) => () => void;
 };
 function createStorageAccessors<T>(
   key: string,
@@ -20,6 +23,7 @@ function createStorageAccessors<T>(
   get: () => Promise<T>;
   set: (value: T) => Promise<void>;
   remove: () => Promise<void>;
+  onChange: (callback: OnChangeCallback<T>) => () => void;
 };
 function createStorageAccessors<T>(key: string, defaultValue?: T) {
   return {
@@ -32,6 +36,24 @@ function createStorageAccessors<T>(key: string, defaultValue?: T) {
     },
     remove: async () => {
       await browser.storage.local.remove(key);
+    },
+    onChange: (callback: OnChangeCallback<T>) => {
+      const listener = (changes: Record<string, browser.Storage.StorageChange>, areaName: string) => {
+        if (areaName !== 'local') {
+          return;
+        }
+
+        if (key in changes) {
+          const newValue = (changes[key].newValue as T | undefined) ?? defaultValue;
+          const oldValue = (changes[key].oldValue as T | undefined) ?? defaultValue;
+          callback(newValue as T, oldValue);
+        }
+      };
+
+      browser.storage.onChanged.addListener(listener);
+      return () => {
+        browser.storage.onChanged.removeListener(listener);
+      };
     },
   };
 }
