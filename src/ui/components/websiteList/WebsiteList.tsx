@@ -79,7 +79,7 @@ export function WebsiteList() {
     }
 
     const validPattern = await isValidatePattern(trimmed);
-    if (validPattern) {
+    if (!validPattern) {
       setError('Invalid pattern');
       return;
     }
