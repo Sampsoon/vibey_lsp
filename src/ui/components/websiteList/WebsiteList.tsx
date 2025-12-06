@@ -91,7 +91,7 @@ export function WebsiteList() {
 
   const removePattern = useCallback(
     (index: number) => {
-      updatePatterns(patterns.filter((_, i) => i !== index));
+      void updatePatterns(patterns.filter((_, i) => i !== index));
     },
     [patterns, updatePatterns],
   );
@@ -108,7 +108,7 @@ export function WebsiteList() {
     if (editingIndex !== null && editValue.trim()) {
       const newPatterns = [...patterns];
       newPatterns[editingIndex] = editValue.trim();
-      updatePatterns(newPatterns);
+      void updatePatterns(newPatterns);
     }
     setEditingIndex(null);
     setEditValue('');
