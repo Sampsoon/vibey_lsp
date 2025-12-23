@@ -52,7 +52,7 @@ export function WebsiteList() {
       const granted = await requestPermissionsForMatchConfig(matchConfig);
 
       if (!granted) {
-        return { success: false, error: 'Permission denied' };
+        return { success: false };
       }
 
       setFilterMode(newMode);

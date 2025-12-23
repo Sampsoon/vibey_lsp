@@ -15,11 +15,22 @@ export function getMatchConfigFromWebsiteFilter(config: WebsiteFilterConfig): Co
   };
 }
 
+let isRequesting = false;
+
 export async function requestPermissionsForMatchConfig(matchConfig: ContentScriptMatchConfig): Promise<boolean> {
   if (matchConfig.matches.length === 0) {
     return true;
   }
 
-  const result = await browser.permissions.request({ origins: matchConfig.matches });
-  return result;
+  if (isRequesting) {
+    return false;
+  }
+
+  isRequesting = true;
+  try {
+    const result = await browser.permissions.request({ origins: matchConfig.matches });
+    return result;
+  } finally {
+    isRequesting = false;
+  }
 }
