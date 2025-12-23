@@ -6,11 +6,11 @@ export function getMatchConfigFromWebsiteFilter(config: WebsiteFilterConfig): Co
   if (config.mode === WebsiteFilterMode.ALLOW_ALL) {
     return {
       matches: ['<all_urls>'],
-      excludeMatches: config.blockList,
+      excludeMatches: config.patternList,
     };
   }
   return {
-    matches: config.allowList.length > 0 ? config.allowList : [],
+    matches: config.patternList,
     excludeMatches: [],
   };
 }

@@ -1,10 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, type ChangeEvent, type KeyboardEvent } from 'react';
 import { ToggleSwitch, Input, IconButton, bodyTextStyle, TrashIcon } from '../common';
 import { storage, WebsiteFilterMode } from '../../../storage';
 import { getMatchConfigFromWebsiteFilter, requestPermissionsForMatchConfig } from '../../../permissions';
 import browser from 'webextension-polyfill';
 
-async function isValidatePattern(pattern: string): Promise<boolean> {
+async function isValidPattern(pattern: string): Promise<boolean> {
   try {
     await browser.permissions.contains({ origins: [pattern] });
     return true;
@@ -13,10 +13,11 @@ async function isValidatePattern(pattern: string): Promise<boolean> {
   }
 }
 
+type UpdateResult = { success: true } | { success: false; error?: string };
+
 export function WebsiteList() {
   const [filterMode, setFilterMode] = useState<WebsiteFilterMode>(WebsiteFilterMode.ALLOW_ALL);
-  const [blockList, setBlockList] = useState<string[]>([]);
-  const [allowList, setAllowList] = useState<string[]>([]);
+  const [patterns, setPatterns] = useState<string[]>([]);
 
   const [newPattern, setNewPattern] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -25,14 +26,10 @@ export function WebsiteList() {
 
   const [error, setError] = useState<string | null>(null);
 
-  const patterns = filterMode === WebsiteFilterMode.ALLOW_ALL ? blockList : allowList;
-  const setPatterns = filterMode === WebsiteFilterMode.ALLOW_ALL ? setBlockList : setAllowList;
-
   useEffect(() => {
-    void storage.websiteFilter.get().then(({ mode, blockList, allowList }) => {
+    void storage.websiteFilter.get().then(({ mode, patternList }) => {
       setFilterMode(mode);
-      setBlockList(blockList);
-      setAllowList(allowList);
+      setPatterns(patternList);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setAnimate(true);
@@ -41,36 +38,49 @@ export function WebsiteList() {
     });
   }, []);
 
-  const updatePatterns = useCallback(
-    async (newPatterns: string[]) => {
-      const config =
-        filterMode === WebsiteFilterMode.ALLOW_ALL
-          ? { mode: filterMode, blockList: newPatterns, allowList }
-          : { mode: filterMode, blockList, allowList: newPatterns };
+  const updateConfig = useCallback(
+    async (newMode: WebsiteFilterMode, newPatterns: string[], patternToValidate?: string): Promise<UpdateResult> => {
+      if (patternToValidate) {
+        const valid = await isValidPattern(patternToValidate);
+        if (!valid) {
+          return { success: false, error: 'Invalid pattern' };
+        }
+      }
 
+      const config = { mode: newMode, patternList: newPatterns };
       const matchConfig = getMatchConfigFromWebsiteFilter(config);
       const granted = await requestPermissionsForMatchConfig(matchConfig);
 
       if (!granted) {
-        return;
+        return { success: false, error: 'Permission denied' };
       }
 
+      setFilterMode(newMode);
       setPatterns(newPatterns);
       void storage.websiteFilter.set(config);
+      return { success: true };
     },
-    [setPatterns, filterMode, blockList, allowList],
+    [],
+  );
+
+  const updatePatterns = useCallback(
+    (newPatterns: string[], patternToValidate?: string): Promise<UpdateResult> => {
+      return updateConfig(filterMode, newPatterns, patternToValidate);
+    },
+    [filterMode, updateConfig],
   );
 
   const handleFilterModeChange = useCallback(
     (mode: WebsiteFilterMode) => {
-      setFilterMode(mode);
-      const config = { mode, blockList, allowList };
-      const matchConfig = getMatchConfigFromWebsiteFilter(config);
-      void requestPermissionsForMatchConfig(matchConfig);
-      void storage.websiteFilter.set(config);
+      void updateConfig(mode, patterns);
     },
-    [blockList, allowList],
+    [patterns, updateConfig],
   );
+
+  const clearEditState = useCallback(() => {
+    setEditingIndex(null);
+    setEditValue('');
+  }, []);
 
   const addPattern = useCallback(async () => {
     const trimmed = newPattern.trim();
@@ -78,30 +88,15 @@ export function WebsiteList() {
       return;
     }
 
-    const newPatterns = [trimmed, ...patterns];
-    const config =
-      filterMode === WebsiteFilterMode.ALLOW_ALL
-        ? { mode: filterMode, blockList: newPatterns, allowList }
-        : { mode: filterMode, blockList, allowList: newPatterns };
+    const result = await updatePatterns([trimmed, ...patterns], trimmed);
 
-    const matchConfig = getMatchConfigFromWebsiteFilter(config);
-    const granted = await requestPermissionsForMatchConfig(matchConfig);
-
-    if (!granted) {
-      return;
+    if (result.success) {
+      setError(null);
+      setNewPattern('');
+    } else if (result.error) {
+      setError(result.error);
     }
-
-    const validPattern = await isValidatePattern(trimmed);
-    if (!validPattern) {
-      setError('Invalid pattern');
-      return;
-    }
-
-    setError(null);
-    setPatterns(newPatterns);
-    void storage.websiteFilter.set(config);
-    setNewPattern('');
-  }, [newPattern, patterns, filterMode, blockList, allowList, setPatterns]);
+  }, [newPattern, patterns, updatePatterns]);
 
   const removePattern = useCallback(
     (index: number) => {
@@ -118,20 +113,56 @@ export function WebsiteList() {
     [patterns],
   );
 
-  const saveEdit = useCallback(() => {
-    if (editingIndex !== null && editValue.trim()) {
-      const newPatterns = [...patterns];
-      newPatterns[editingIndex] = editValue.trim();
-      void updatePatterns(newPatterns);
+  const saveEdit = useCallback(async () => {
+    if (editingIndex === null) {
+      return;
     }
-    setEditingIndex(null);
-    setEditValue('');
-  }, [editingIndex, editValue, patterns, updatePatterns]);
 
-  const cancelEdit = useCallback(() => {
-    setEditingIndex(null);
-    setEditValue('');
+    const trimmed = editValue.trim();
+    if (!trimmed) {
+      clearEditState();
+      return;
+    }
+
+    const newPatterns = [...patterns];
+    newPatterns[editingIndex] = trimmed;
+    const result = await updatePatterns(newPatterns, trimmed);
+
+    if (result.success) {
+      setError(null);
+      clearEditState();
+    } else if (result.error) {
+      setError(result.error);
+    }
+  }, [editingIndex, editValue, patterns, updatePatterns, clearEditState]);
+
+  const handleNewPatternChange = useCallback((value: string) => {
+    setNewPattern(value);
+    setError(null);
   }, []);
+
+  const handleNewPatternSubmit = useCallback(() => {
+    void addPattern();
+  }, [addPattern]);
+
+  const handleEditChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setEditValue(e.target.value);
+  }, []);
+
+  const handleEditKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        void saveEdit();
+      } else if (e.key === 'Escape') {
+        clearEditState();
+      }
+    },
+    [saveEdit, clearEditState],
+  );
+
+  const handleEditBlur = useCallback(() => {
+    void saveEdit();
+  }, [saveEdit]);
 
   const emptyStateMessage =
     filterMode === WebsiteFilterMode.BLOCK_ALL
@@ -142,17 +173,6 @@ export function WebsiteList() {
     filterMode === WebsiteFilterMode.ALLOW_ALL
       ? 'This extension won\'t run on blocked sites, but due to Chrome API restrictions, it still has access to blocked sites. Use "Block all websites" to limit Chrome permissions to only the sites you choose.'
       : null;
-
-  const handleEditKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        saveEdit();
-      } else if (e.key === 'Escape') {
-        cancelEdit();
-      }
-    },
-    [saveEdit, cancelEdit],
-  );
 
   const containerStyle = {
     display: 'flex',
@@ -277,13 +297,8 @@ export function WebsiteList() {
         <div style={tableHeaderStyle}>
           <Input
             value={newPattern}
-            onChange={(value) => {
-              setNewPattern(value);
-              setError(null);
-            }}
-            onSubmit={() => {
-              void addPattern();
-            }}
+            onChange={handleNewPatternChange}
+            onSubmit={handleNewPatternSubmit}
             placeholder="*://*.example.com/*"
           />
         </div>
@@ -296,11 +311,9 @@ export function WebsiteList() {
                   <input
                     type="text"
                     value={editValue}
-                    onChange={(e) => {
-                      setEditValue(e.target.value);
-                    }}
+                    onChange={handleEditChange}
                     onKeyDown={handleEditKeyDown}
-                    onBlur={saveEdit}
+                    onBlur={handleEditBlur}
                     autoFocus
                     style={editInputStyle}
                   />
