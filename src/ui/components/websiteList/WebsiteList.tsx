@@ -177,52 +177,31 @@ export function WebsiteList() {
   const containerStyle = {
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '12px',
-    padding: '0 8px 8px 8px',
-    height: '100%',
-    maxHeight: 'inherit',
+    gap: '16px',
   };
 
   const tableContainerStyle = {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    overflow: 'hidden',
-    flex: 1,
     border: '1px solid var(--border-color)',
-    borderRadius: '8px',
+    borderRadius: '10px',
     backgroundColor: 'var(--card-bg)',
     boxShadow: 'var(--shadow-sm)',
+    overflow: 'hidden',
   };
 
   const tableHeaderStyle = {
-    display: 'flex',
-    gap: '12px',
-    padding: '12px 12px',
+    padding: '14px 16px',
     borderBottom: '1px solid var(--border-color)',
-    backgroundColor: 'var(--card-bg)',
-    flexShrink: 0,
-    alignItems: 'center',
-    position: 'sticky' as const,
-    top: 0,
-    zIndex: 1,
-    borderTopLeftRadius: '8px',
-    borderTopRightRadius: '8px',
   };
 
   const tableBodyStyle = {
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '0',
-    overflowY: 'auto' as const,
-    overflowX: 'hidden' as const,
-    flex: 1,
-    minHeight: 0,
   };
 
   const tableRowStyle = {
     display: 'flex',
-    gap: '10px',
-    padding: '8px 12px',
+    gap: '12px',
+    padding: '10px 16px',
     borderBottom: '1px solid var(--border-color)',
     alignItems: 'center',
     transition: 'background-color 0.15s ease',
@@ -266,10 +245,10 @@ export function WebsiteList() {
 
   const permissionNoteStyle = {
     ...bodyTextStyle,
-    padding: '12px 16px',
+    padding: '14px 16px',
     textAlign: 'center' as const,
     color: 'var(--text-secondary)',
-    fontSize: '12px',
+    fontSize: '13px',
     borderTop: '1px solid var(--border-color)',
   };
 
@@ -283,15 +262,13 @@ export function WebsiteList() {
 
   return (
     <div style={containerStyle}>
-      <div style={{ marginBottom: '4px' }}>
-        <ToggleSwitch
-          value={filterMode}
-          onChange={handleFilterModeChange}
-          options={[WebsiteFilterMode.ALLOW_ALL, WebsiteFilterMode.BLOCK_ALL]}
-          labels={['Run on all websites', 'Block all websites']}
-          animate={animate}
-        />
-      </div>
+      <ToggleSwitch
+        value={filterMode}
+        onChange={handleFilterModeChange}
+        options={[WebsiteFilterMode.ALLOW_ALL, WebsiteFilterMode.BLOCK_ALL]}
+        labels={['Run on all websites', 'Block all websites']}
+        animate={animate}
+      />
 
       <div style={tableContainerStyle}>
         <div style={tableHeaderStyle}>

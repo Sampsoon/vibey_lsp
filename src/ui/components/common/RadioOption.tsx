@@ -10,20 +10,16 @@ interface RadioOptionProps {
 }
 
 const containerStyle = (selected: boolean) => ({
-  border: selected ? `1px solid var(--radio-selected-border)` : '1px solid var(--border-color)',
+  border: selected ? '1px solid var(--radio-selected-border)' : '1px solid var(--border-color)',
   borderRadius: '10px',
-  padding: '12px',
-  marginBottom: '10px',
+  padding: '14px 16px',
   background: selected
-    ? `linear-gradient(180deg, var(--radio-selected-bg-start) 0%, var(--radio-selected-bg-end) 100%)`
+    ? 'linear-gradient(180deg, var(--radio-selected-bg-start) 0%, var(--radio-selected-bg-end) 100%)'
     : 'var(--card-bg)',
   boxShadow: 'var(--shadow-sm)',
-  overflow: 'hidden',
-  backdropFilter: selected ? 'saturate(110%) blur(2px)' : undefined,
-  WebkitBackdropFilter: selected ? 'saturate(110%) blur(2px)' : undefined,
   opacity: selected ? 1 : 0.5,
   cursor: 'pointer',
-  transition: 'all 0.15s ease',
+  transition: 'opacity 0.15s ease, border-color 0.15s ease',
 });
 
 const radioHeaderStyle = (selected: boolean) => ({

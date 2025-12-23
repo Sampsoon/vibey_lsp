@@ -18,7 +18,7 @@ export enum APIProvider {
   CUSTOM = 'Custom',
 }
 
-export type SettingsTab = 'api' | 'websites' | 'contact';
+export type SettingsTab = 'api' | 'websites';
 
 export enum WebsiteFilterMode {
   ALLOW_ALL = 'allow-all',

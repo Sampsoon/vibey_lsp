@@ -1,45 +1,57 @@
-import { useState, useEffect } from 'react';
-import { ApiConfiguration, SettingsMenu, WebsiteList, ContactSection } from './components';
-import { storage, SettingsTab } from '../storage';
+import browser from 'webextension-polyfill';
+import { Button, GithubIcon, SettingsIcon } from './components';
+
+const GITHUB_URL = 'https://github.com/Sampsoon/vibey_lsp';
 
 function App() {
-  const [selectedTab, setSelectedTab] = useState<SettingsTab>('api');
-  const [animate, setAnimate] = useState(false);
+  const handleOpenSettings = () => {
+    void browser.runtime.openOptionsPage();
+  };
 
-  useEffect(() => {
-    void storage.selectedTab.get().then((tab) => {
-      if (tab) {
-        setSelectedTab(tab);
-      }
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setAnimate(true);
-        });
-      });
-    });
-  }, []);
-
-  const handleTabSelect = (tab: SettingsTab) => {
-    setSelectedTab(tab);
-    void storage.selectedTab.set(tab);
+  const handleOpenGithub = () => {
+    window.open(GITHUB_URL, '_blank', 'noopener,noreferrer');
   };
 
   return (
     <div
       style={{
-        width: '800px',
-        height: '600px',
-        padding: '20px 16px',
+        width: '320px',
+        padding: '24px',
         display: 'flex',
-        gap: '16px',
-        overflow: 'hidden',
+        flexDirection: 'column',
+        gap: '20px',
       }}
     >
-      <SettingsMenu selected={selectedTab} onSelect={handleTabSelect} animate={animate} />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {selectedTab === 'api' && <ApiConfiguration />}
-        {selectedTab === 'websites' && <WebsiteList />}
-        {selectedTab === 'contact' && <ContactSection />}
+      <h1
+        style={{
+          margin: 0,
+          fontSize: '20px',
+          fontWeight: 650,
+          color: 'var(--text-primary)',
+          textAlign: 'center',
+          letterSpacing: '-0.01em',
+        }}
+      >
+        Vibey LSP
+      </h1>
+
+      <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+        <Button
+          onClick={handleOpenSettings}
+          icon={<SettingsIcon width={18} height={18} />}
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            padding: '12px 16px',
+            fontWeight: 600,
+          }}
+        >
+          Settings
+        </Button>
+
+        <Button onClick={handleOpenGithub} style={{ padding: '12px' }}>
+          <GithubIcon width={20} height={20} />
+        </Button>
       </div>
     </div>
   );

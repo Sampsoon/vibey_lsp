@@ -1,78 +1,28 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { baseSliderStyle, ApiKeyIcon, GlobeIcon, ContactIcon } from '../common';
-
-type Tab = 'api' | 'websites' | 'contact';
+import { baseSliderStyle, ApiKeyIcon, GlobeIcon } from '../common';
+import { SettingsTab } from '../../../storage';
 
 interface SettingsMenuProps {
-  selected: Tab;
-  onSelect: (tab: Tab) => void;
+  selected: SettingsTab;
+  onSelect: (tab: SettingsTab) => void;
   animate: boolean;
 }
 
-const ITEM_HEIGHT = 62;
-const BUTTON_HEIGHT = 52;
-const ITEM_GAP = 6;
-const BORDER_WIDTH = 16;
-const SLIDER_OFFSET = 2;
+const BUTTON_HEIGHT = 48;
+const ITEM_GAP = 4;
+const SIDEBAR_WIDTH = 200;
+const SIDEBAR_PADDING = 16;
 
-const tabs: { id: Tab; title: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }[] = [
-  {
-    id: 'api',
-    title: 'API Key',
-    icon: ApiKeyIcon,
-  },
-  {
-    id: 'websites',
-    title: 'Websites',
-    icon: GlobeIcon,
-  },
-  {
-    id: 'contact',
-    title: 'Contact',
-    icon: ContactIcon,
-  },
+const tabs: { id: SettingsTab; title: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }[] = [
+  { id: 'api', title: 'API Key', icon: ApiKeyIcon },
+  { id: 'websites', title: 'Websites', icon: GlobeIcon },
 ];
 
-const baseContainerStyle = {
-  display: 'flex',
-  flexDirection: 'column' as const,
-  gap: `${ITEM_GAP.toString()}px`,
-  paddingRight: `${BORDER_WIDTH.toString()}px`,
-  borderRight: '1.5px solid var(--border-color)',
-  position: 'relative' as const,
-  userSelect: 'none' as const,
-};
-
-const containerStyle = (isDragging: boolean) => ({
-  ...baseContainerStyle,
-  cursor: isDragging ? 'grabbing' : 'grab',
-});
-
-const sliderStyle = (index: number, isDragging: boolean, animate: boolean) => ({
-  ...baseSliderStyle,
-  width: `calc(100% - ${BORDER_WIDTH.toString()}px)`,
-  height: `${BUTTON_HEIGHT.toString()}px`,
-  transition: animate ? (isDragging ? 'var(--transition-dragging)' : 'var(--transition-normal)') : 'none',
-  transform: `translateY(${(index * ITEM_HEIGHT + SLIDER_OFFSET).toString()}px)`,
-});
-
-const baseButtonStyle = {
-  border: 'none',
-  cursor: 'pointer',
-  padding: '16px 14px',
-  borderRadius: '8px',
-  backgroundColor: 'transparent',
-  zIndex: 1,
-  position: 'relative' as const,
-};
-
-const buttonStyle = (isSelected: boolean) => ({
-  ...baseButtonStyle,
-  color: isSelected ? 'var(--primary-color)' : 'var(--text-secondary)',
-});
-
 export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps) {
-  const selectedIndex = tabs.findIndex((tab) => tab.id === selected);
+  const selectedIndex = Math.max(
+    0,
+    tabs.findIndex((tab) => tab.id === selected),
+  );
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -82,17 +32,15 @@ export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps)
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (!isDragging || !containerRef.current) {
-        return;
-      }
+      if (!isDragging || !containerRef.current) return;
 
       const rect = containerRef.current.getBoundingClientRect();
-      const y = e.clientY - rect.top;
-      const targetIndex = Math.max(0, Math.min(tabs.length - 1, Math.floor(y / ITEM_HEIGHT)));
-      const targetTab = tabs[targetIndex];
+      const y = e.clientY - rect.top - SIDEBAR_PADDING;
+      const itemHeight = BUTTON_HEIGHT + ITEM_GAP;
+      const targetIndex = Math.max(0, Math.min(tabs.length - 1, Math.floor(Math.max(0, y) / itemHeight)));
 
-      if (targetTab.id !== selected) {
-        onSelect(targetTab.id);
+      if (tabs[targetIndex].id !== selected) {
+        onSelect(tabs[targetIndex].id);
       }
     },
     [isDragging, selected, onSelect],
@@ -103,13 +51,9 @@ export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps)
   }, []);
 
   useEffect(() => {
-    if (!isDragging) {
-      return;
-    }
-
+    if (!isDragging) return;
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -117,29 +61,75 @@ export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps)
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   const handleTabClick = useCallback(
-    (tabId: Tab) => {
-      if (!isDragging) {
-        onSelect(tabId);
-      }
+    (tabId: SettingsTab) => {
+      if (!isDragging) onSelect(tabId);
     },
     [isDragging, onSelect],
   );
 
+  const sliderY = SIDEBAR_PADDING + selectedIndex * (BUTTON_HEIGHT + ITEM_GAP);
+
   return (
-    <div ref={containerRef} style={containerStyle(isDragging)} onMouseDown={handleMouseDown}>
-      <div style={sliderStyle(selectedIndex, isDragging, animate)} />
+    <nav
+      ref={containerRef}
+      onMouseDown={handleMouseDown}
+      style={{
+        width: SIDEBAR_WIDTH,
+        flexShrink: 0,
+        padding: SIDEBAR_PADDING,
+        borderRight: '1px solid var(--border-color)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: ITEM_GAP,
+        position: 'relative',
+        userSelect: 'none',
+        cursor: isDragging ? 'grabbing' : 'grab',
+      }}
+    >
+      {/* Animated slider background */}
+      <div
+        style={{
+          ...baseSliderStyle,
+          position: 'absolute',
+          left: SIDEBAR_PADDING,
+          right: SIDEBAR_PADDING,
+          height: BUTTON_HEIGHT,
+          top: 0,
+          transform: `translateY(${sliderY.toString()}px)`,
+          transition: animate ? (isDragging ? 'var(--transition-dragging)' : 'var(--transition-normal)') : 'none',
+        }}
+      />
+
+      {/* Tab buttons */}
       {tabs.map(({ id, title, icon: Icon }) => (
         <button
           key={id}
           onClick={() => {
             handleTabClick(id);
           }}
-          style={buttonStyle(selected === id)}
           title={title}
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            width: '100%',
+            height: BUTTON_HEIGHT,
+            padding: '0 14px',
+            border: 'none',
+            borderRadius: 8,
+            backgroundColor: 'transparent',
+            color: selected === id ? 'var(--primary-color)' : 'var(--text-secondary)',
+            cursor: 'pointer',
+            transition: 'color 0.15s ease',
+            textAlign: 'left',
+          }}
         >
-          <Icon width={24} height={24} />
+          <Icon width={20} height={20} style={{ flexShrink: 0 }} />
+          <span style={{ fontSize: 14, fontWeight: 500 }}>{title}</span>
         </button>
       ))}
-    </div>
+    </nav>
   );
 }
