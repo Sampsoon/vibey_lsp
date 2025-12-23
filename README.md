@@ -1,5 +1,7 @@
 # Vibey LSP
 
+This is a Chrome extension that adds LSP-style documentation to any code on the internet. This project is nearing completion but still has a little way to go.
+
 ## Scripts
 
 - `pnpm dev` — Start development server
