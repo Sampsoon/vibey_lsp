@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { Button, GithubIcon, SettingsIcon } from './components';
+import { Button, GithubIcon, SettingsIcon, SetupChecklist } from './components';
 
 const GITHUB_URL = 'https://github.com/Sampsoon/vibey_lsp';
 
@@ -34,6 +34,8 @@ function App() {
       >
         Vibey LSP
       </h1>
+
+      <SetupChecklist />
 
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
         <Button

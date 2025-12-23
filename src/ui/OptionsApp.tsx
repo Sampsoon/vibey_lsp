@@ -1,22 +1,30 @@
 import { useEffect, useState } from 'react';
 import { ApiConfiguration, SettingsMenu, WebsiteList } from './components';
-import { storage, type SettingsTab } from '../storage';
+import { storage, SettingsTab, TAB_QUERY_PARAM } from '../storage';
 
 function OptionsApp() {
-  const [selectedTab, setSelectedTab] = useState<SettingsTab>('api');
+  const [selectedTab, setSelectedTab] = useState<SettingsTab>(SettingsTab.API);
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
-    void storage.selectedTab.get().then((tab) => {
-      if (tab === 'api' || tab === 'websites') {
-        setSelectedTab(tab);
+    const init = async () => {
+      const params = new URLSearchParams(window.location.search);
+      let tab = params.get(TAB_QUERY_PARAM) as SettingsTab | null;
+
+      if (tab !== SettingsTab.API && tab !== SettingsTab.WEBSITES) {
+        tab = (await storage.selectedTab.get()) ?? SettingsTab.API;
       }
+
+      setSelectedTab(tab);
+
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setAnimate(true);
         });
       });
-    });
+    };
+
+    void init();
   }, []);
 
   const handleTabSelect = (tab: SettingsTab) => {
@@ -41,10 +49,10 @@ function OptionsApp() {
         }}
       >
         <h1 style={{ color: 'var(--text-primary)', margin: '0 0 20px 0', fontSize: '22px' }}>
-          {selectedTab === 'api' ? 'API Configuration' : 'Website Settings'}
+          {selectedTab === SettingsTab.API ? 'API Configuration' : 'Website Settings'}
         </h1>
-        {selectedTab === 'api' && <ApiConfiguration />}
-        {selectedTab === 'websites' && <WebsiteList />}
+        {selectedTab === SettingsTab.API && <ApiConfiguration />}
+        {selectedTab === SettingsTab.WEBSITES && <WebsiteList />}
       </main>
     </div>
   );

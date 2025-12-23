@@ -18,7 +18,12 @@ export enum APIProvider {
   CUSTOM = 'Custom',
 }
 
-export type SettingsTab = 'api' | 'websites';
+export enum SettingsTab {
+  API = 'api',
+  WEBSITES = 'websites',
+}
+
+export const TAB_QUERY_PARAM = 'tab';
 
 export enum WebsiteFilterMode {
   ALLOW_ALL = 'allow-all',

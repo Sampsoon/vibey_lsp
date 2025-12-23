@@ -14,8 +14,8 @@ const SIDEBAR_WIDTH = 200;
 const SIDEBAR_PADDING = 16;
 
 const tabs: { id: SettingsTab; title: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }[] = [
-  { id: 'api', title: 'API Key', icon: ApiKeyIcon },
-  { id: 'websites', title: 'Websites', icon: GlobeIcon },
+  { id: SettingsTab.API, title: 'API Key', icon: ApiKeyIcon },
+  { id: SettingsTab.WEBSITES, title: 'Websites', icon: GlobeIcon },
 ];
 
 export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps) {
