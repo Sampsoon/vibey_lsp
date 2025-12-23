@@ -165,9 +165,15 @@ export function WebsiteList() {
   }, [saveEdit]);
 
   const emptyStateMessage =
-    filterMode === WebsiteFilterMode.BLOCK_ALL
-      ? 'Add URL patterns to allow specific sites'
-      : 'Add URL patterns to block specific sites';
+    filterMode === WebsiteFilterMode.BLOCK_ALL ? (
+      <>
+        Add URL patterns to <strong>allow</strong> specific sites
+      </>
+    ) : (
+      <>
+        Add URL patterns to <strong>block</strong> specific sites
+      </>
+    );
 
   const permissionNote =
     filterMode === WebsiteFilterMode.ALLOW_ALL
