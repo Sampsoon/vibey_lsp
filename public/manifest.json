@@ -12,7 +12,7 @@
     "open_in_tab": true
   },
   "background": {
-    "service_worker": "src/colorFunctionality/serviceWorker/serviceWorker.ts",
+    "service_worker": "src/coreFunctionality/serviceWorker/serviceWorker.ts",
     "type": "module"
   },
   "icons": {
