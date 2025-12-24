@@ -46,3 +46,19 @@ export const smallHeadingStyle = {
   fontWeight: 600,
   color: 'var(--text-primary)',
 };
+
+export const infoBoxHeaderStyle = {
+  padding: '10px 14px',
+  background: 'var(--infobox-header-bg)',
+  borderBottom: '1px solid var(--infobox-header-border)',
+  display: 'flex' as const,
+  alignItems: 'center' as const,
+  gap: '10px',
+};
+
+export const infoBoxAccentStyle = {
+  width: '3px',
+  height: '14px',
+  borderRadius: '2px',
+  backgroundColor: 'var(--infobox-accent)',
+};

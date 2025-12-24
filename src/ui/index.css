@@ -37,6 +37,11 @@
   --radio-selected-bg-start: rgba(var(--primary-rgb), 0.08);
   --radio-selected-bg-end: rgba(var(--primary-rgb), 0.04);
   
+  /* InfoBox styling */
+  --infobox-header-bg: linear-gradient(135deg, rgba(var(--primary-rgb), 0.08) 0%, rgba(var(--primary-rgb), 0.03) 100%);
+  --infobox-header-border: rgba(var(--primary-rgb), 0.12);
+  --infobox-accent: rgba(var(--primary-rgb), 0.6);
+  
   /* Syntax highlighting */
   --code-keyword: #AF00DB;
   --code-variable: #001080;
@@ -101,6 +106,11 @@
     --radio-selected-border: rgba(var(--primary-rgb), 0.30);
     --radio-selected-bg-start: rgba(var(--primary-rgb), 0.12);
     --radio-selected-bg-end: rgba(var(--primary-rgb), 0.08);
+    
+    /* InfoBox styling */
+    --infobox-header-bg: linear-gradient(135deg, rgba(var(--primary-rgb), 0.12) 0%, rgba(var(--primary-rgb), 0.05) 100%);
+    --infobox-header-border: rgba(var(--primary-rgb), 0.18);
+    --infobox-accent: rgba(var(--primary-rgb), 0.7);
     
     /* Syntax highlighting */
     --code-keyword: #C586C0;
