@@ -1,0 +1,20 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bubbleGrad" x1="10" y1="110" x2="118" y2="10" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5f6be1"/>
+      <stop offset="100%" stop-color="#7e74ea"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Speech bubble -->
+  <rect x="8" y="8" width="112" height="80" rx="16" fill="url(#bubbleGrad)"/>
+  <path d="M24 88 L24 112 L52 88" fill="url(#bubbleGrad)"/>
+  
+  <!-- Line 1 -->
+  <line x1="22" y1="36" x2="48" y2="36" stroke="#5eedbd" stroke-width="9" stroke-linecap="round"/>
+  <line x1="58" y1="36" x2="104" y2="36" stroke="#5dd4ff" stroke-width="9" stroke-linecap="round"/>
+  
+  <!-- Line 2 -->
+  <line x1="22" y1="60" x2="62" y2="60" stroke="#ff6b91" stroke-width="9" stroke-linecap="round"/>
+  <line x1="72" y1="60" x2="92" y2="60" stroke="white" stroke-width="9" stroke-linecap="round" opacity="0.5"/>
+</svg>
