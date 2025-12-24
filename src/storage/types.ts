@@ -41,3 +41,9 @@ export const DEFAULT_WEBSITE_FILTER_CONFIG: WebsiteFilterConfig = {
   blockList: [],
   allowList: [],
 };
+
+export enum ThemeMode {
+  LIGHT = 'light',
+  DARK = 'dark',
+  SYSTEM = 'system',
+}

@@ -69,10 +69,54 @@
   --transition-normal: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, background 0.3s ease;
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-primary: #B5B0C2;
+  --text-primary: #1A1528;
+  --text-secondary: #3A3550;
+  --text-disabled: #706A82;
+  --border-color: rgba(26, 21, 40, 0.22);
+  --input-bg: #C0BBCA;
+  --code-bg: #C5C0D0;
+  --card-bg: #AAA5B8;
+  --card-bg-hover: #B8B3C2;
+  
+  --primary-color: #7868A8;
+  --success-color: #48A070;
+  --warning-color: #D08850;
+  --alert-color: #C04858;
+  --invite-color: #4898B0;
+  
+  --shadow-base: 45, 40, 64;
+  --shadow-sm: 0 1px 3px 0 rgba(var(--shadow-base), 0.12), 0 1px 2px 0 rgba(var(--shadow-base), 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(var(--shadow-base), 0.18), 0 2px 4px -1px rgba(var(--shadow-base), 0.12);
+  --shadow-lg: 0 10px 15px -3px rgba(var(--shadow-base), 0.22), 0 4px 6px -2px rgba(var(--shadow-base), 0.15);
+  --shadow-xl: 0 20px 25px -5px rgba(var(--shadow-base), 0.26), 0 10px 10px -5px rgba(var(--shadow-base), 0.12);
+
+  --primary-rgb: 120, 104, 168;
+  --slider-bg-start: rgba(var(--primary-rgb), 0.22);
+  --slider-bg-end: rgba(var(--primary-rgb), 0.14);
+  --slider-border: rgba(var(--primary-rgb), 0.40);
+  --slider-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.20), 0 2px 4px rgba(var(--shadow-base), 0.10);
+  --radio-selected-border: rgba(var(--primary-rgb), 0.28);
+  --radio-selected-bg-start: rgba(var(--primary-rgb), 0.14);
+  --radio-selected-bg-end: rgba(var(--primary-rgb), 0.08);
+  
+  --infobox-header-bg: linear-gradient(135deg, rgba(var(--primary-rgb), 0.14) 0%, rgba(var(--primary-rgb), 0.06) 100%);
+  --infobox-header-border: rgba(var(--primary-rgb), 0.20);
+  --infobox-accent: rgba(var(--primary-rgb), 0.65);
+  
+  --code-keyword: #8860A8;
+  --code-variable: #2D6850;
+  --code-operator: #2D2840;
+  --code-class: #386888;
+  --code-string: #A06030;
+  --code-comment: #706888;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     color-scheme: dark;
-    /* Base colors - warm lavender mid-tones (~50% brightness) */
     --bg-primary: #B5B0C2;
     --text-primary: #1A1528;
     --text-secondary: #3A3550;
@@ -83,21 +127,18 @@
     --card-bg: #AAA5B8;
     --card-bg-hover: #B8B3C2;
     
-    /* Theme colors - slightly muted for mid-tone bg */
     --primary-color: #7868A8;
     --success-color: #48A070;
     --warning-color: #D08850;
     --alert-color: #C04858;
     --invite-color: #4898B0;
     
-    /* Shadow base and derived shadows */
     --shadow-base: 45, 40, 64;
     --shadow-sm: 0 1px 3px 0 rgba(var(--shadow-base), 0.12), 0 1px 2px 0 rgba(var(--shadow-base), 0.08);
     --shadow-md: 0 4px 6px -1px rgba(var(--shadow-base), 0.18), 0 2px 4px -1px rgba(var(--shadow-base), 0.12);
     --shadow-lg: 0 10px 15px -3px rgba(var(--shadow-base), 0.22), 0 4px 6px -2px rgba(var(--shadow-base), 0.15);
     --shadow-xl: 0 20px 25px -5px rgba(var(--shadow-base), 0.26), 0 10px 10px -5px rgba(var(--shadow-base), 0.12);
 
-    /* Primary color variations */
     --primary-rgb: 120, 104, 168;
     --slider-bg-start: rgba(var(--primary-rgb), 0.22);
     --slider-bg-end: rgba(var(--primary-rgb), 0.14);
@@ -107,12 +148,10 @@
     --radio-selected-bg-start: rgba(var(--primary-rgb), 0.14);
     --radio-selected-bg-end: rgba(var(--primary-rgb), 0.08);
     
-    /* InfoBox styling */
     --infobox-header-bg: linear-gradient(135deg, rgba(var(--primary-rgb), 0.14) 0%, rgba(var(--primary-rgb), 0.06) 100%);
     --infobox-header-border: rgba(var(--primary-rgb), 0.20);
     --infobox-accent: rgba(var(--primary-rgb), 0.65);
     
-    /* Syntax highlighting - adjusted for mid-tone bg */
     --code-keyword: #8860A8;
     --code-variable: #2D6850;
     --code-operator: #2D2840;

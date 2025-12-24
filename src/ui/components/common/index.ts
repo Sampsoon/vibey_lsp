@@ -5,6 +5,7 @@ export * from './InfoBox';
 export * from './Input';
 export * from './PasswordInput';
 export * from './RadioOption';
+export * from './ThemeToggle';
 export * from './ToggleSwitch';
 export * from './styles';
 export * from './TextArea';

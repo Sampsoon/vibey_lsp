@@ -5,6 +5,7 @@ import {
   SettingsTab,
   WebsiteFilterConfig,
   DEFAULT_WEBSITE_FILTER_CONFIG,
+  ThemeMode,
 } from './types';
 import browser from 'webextension-polyfill';
 
@@ -64,4 +65,5 @@ export const storage = {
   apiProvider: createStorageAccessors<APIProvider>('apiProvider'),
   selectedTab: createStorageAccessors<SettingsTab>('selectedTab'),
   websiteFilter: createStorageAccessors<WebsiteFilterConfig>('websiteFilter', DEFAULT_WEBSITE_FILTER_CONFIG),
+  themeMode: createStorageAccessors<ThemeMode>('themeMode', ThemeMode.SYSTEM),
 } as const;

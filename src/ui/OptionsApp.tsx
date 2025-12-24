@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { ApiConfiguration, SettingsMenu, WebsiteList } from './components';
+import { ApiConfiguration, SettingsMenu, WebsiteList, ThemeToggle } from './components';
 import { storage, SettingsTab, TAB_QUERY_PARAM } from '../storage';
+import { useTheme } from './hooks';
 
 function OptionsApp() {
   const [selectedTab, setSelectedTab] = useState<SettingsTab>(SettingsTab.API);
   const [animate, setAnimate] = useState(false);
+  const { themeMode, setTheme } = useTheme();
 
   useEffect(() => {
     const init = async () => {
@@ -37,8 +39,20 @@ function OptionsApp() {
       style={{
         display: 'flex',
         minHeight: '100vh',
+        position: 'relative',
       }}
     >
+      <div
+        style={{
+          position: 'absolute',
+          top: 16,
+          right: 24,
+          zIndex: 10,
+        }}
+      >
+        <ThemeToggle themeMode={themeMode} onThemeChange={setTheme} />
+      </div>
+
       <SettingsMenu selected={selectedTab} onSelect={handleTabSelect} animate={animate} />
 
       <main
