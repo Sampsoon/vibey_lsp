@@ -1,10 +1,12 @@
 import browser from 'webextension-polyfill';
 import { Button, GithubIcon, SettingsIcon, SetupChecklist } from './components';
+import { useTheme } from './hooks';
 import iconUrl from '/icons/icon.svg';
 
 const GITHUB_URL = 'https://github.com/Sampsoon/vibey_lsp';
 
 function App() {
+  useTheme();
   const handleOpenSettings = () => {
     void browser.runtime.openOptionsPage();
   };

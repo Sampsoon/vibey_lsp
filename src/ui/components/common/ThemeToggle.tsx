@@ -7,9 +7,9 @@ interface ThemeToggleProps {
   onThemeChange: (mode: ThemeMode) => void;
 }
 
-const BUTTON_SIZE = 32;
-const PADDING = 4;
-const GAP = 2;
+const BUTTON_SIZE = 40;
+const PADDING = 5;
+const GAP = 3;
 
 const modes = [
   { mode: ThemeMode.LIGHT, icon: SunIcon, label: 'Light' },
@@ -74,7 +74,7 @@ export function ThemeToggle({ themeMode, onThemeChange }: ThemeToggleProps) {
             transition: 'color 0.2s ease',
           }}
         >
-          <Icon width={16} height={16} />
+          <Icon width={20} height={20} />
         </button>
       ))}
     </div>

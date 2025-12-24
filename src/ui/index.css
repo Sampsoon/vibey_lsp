@@ -70,7 +70,7 @@
 }
 
 :root[data-theme="dark"] {
-  color-scheme: dark;
+  color-scheme: light;
   --bg-primary: #B5B0C2;
   --text-primary: #1A1528;
   --text-secondary: #3A3550;
@@ -116,7 +116,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    color-scheme: dark;
+    color-scheme: light;
     --bg-primary: #B5B0C2;
     --text-primary: #1A1528;
     --text-secondary: #3A3550;
