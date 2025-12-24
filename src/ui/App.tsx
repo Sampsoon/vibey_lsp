@@ -1,12 +1,25 @@
 import browser from 'webextension-polyfill';
 import { Button, GithubIcon, SettingsIcon, SetupChecklist } from './components';
 import { useTheme } from './hooks';
+import { ThemeMode } from '../storage';
 import iconUrl from '/icons/icon.svg';
+import iconDarkUrl from '/icons/icon-dark.svg';
 
 const GITHUB_URL = 'https://github.com/Sampsoon/vibey_lsp';
 
+function useIsDarkMode(themeMode: ThemeMode) {
+  if (themeMode === ThemeMode.DARK) {
+    return true;
+  }
+  if (themeMode === ThemeMode.LIGHT) {
+    return false;
+  }
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 function App() {
-  useTheme();
+  const { themeMode } = useTheme();
+  const isDark = useIsDarkMode(themeMode);
   const handleOpenSettings = () => {
     void browser.runtime.openOptionsPage();
   };
@@ -44,7 +57,7 @@ function App() {
         >
           Vibey LSP
         </h1>
-        <img src={iconUrl} alt="" width={24} height={24} />
+        <img src={isDark ? iconDarkUrl : iconUrl} alt="" width={24} height={24} />
       </div>
 
       <SetupChecklist />
