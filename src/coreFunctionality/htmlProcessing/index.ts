@@ -18,6 +18,7 @@ export {
   clearCodeBlockTimeoutIfExists,
   setCodeBlockTimeout,
   CODE_TOKEN_ID_NAME,
+  CODE_DELIMITERS,
   attachIdsToTokens,
   isCodeBlockInView,
   setupIdToElementMapping,

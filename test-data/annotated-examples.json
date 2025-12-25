@@ -1,0 +1,1201 @@
+[
+  {
+    "url": "https://doc.rust-lang.org/book/ch03-05-control-flow.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_8", "tok_b"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://doc.rust-lang.org/book/ch10-02-traits.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_4"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_2"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://doc.rust-lang.org/book/ch16-01-threads.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_8"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_a"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_g", "tok_s"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_j", "tok_v"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_l", "tok_x"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_6", "tok_k", "tok_w"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_h"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://www.typescriptlang.org/docs/handbook/2/classes.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://react.dev/reference/react/useState",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_4"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_6"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_8"],
+        "type": "variable"
+      }
+    ]
+  },
+  {
+    "url": "https://react.dev/reference/react/useEffect",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_0"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://react.dev/reference/react/useContext",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_2"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_4"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://react.dev/learn/passing-props-to-a-component",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_3"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_a"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://nodejs.org/api/fs.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://nodejs.org/api/http.html",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://nodejs.org/api/path.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_2"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://nodejs.org/api/events.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1", "tok_7"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_5", "tok_b"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_9", "tok_c", "tok_j"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_d"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_k"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_h"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.aws.amazon.com/cdk/v2/guide/hello_world.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_4"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_h"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_s"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_11"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_1i"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_1j"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_e", "tok_x"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_p", "tok_16"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_15"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_18"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_1b"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_1e"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_1l"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_1o"],
+        "type": "variable"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.aws.amazon.com/cdk/v2/guide/constructs.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_8"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_9"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_6"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_a"],
+        "type": "variable"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.aws.amazon.com/cdk/v2/guide/stacks.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_c"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_f"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_7"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_a"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_2", "tok_w"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_3", "tok_i"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_4", "tok_1r"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_g", "tok_y"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_q", "tok_11", "tok_1a", "tok_1i"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_12"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_16", "tok_19"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1u"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1b"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1f"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_dynamodb_code_examples.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_3", "tok_9"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_2", "tok_j"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_d"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_7", "tok_o"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_h", "tok_q"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_m", "tok_t", "tok_y"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_p"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_s"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_v"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_lambda_code_examples.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2", "tok_9"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_d"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_3", "tok_i"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_7", "tok_k"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_h", "tok_t"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_n", "tok_13", "tok_1b"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_w", "tok_15"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_z"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_14"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_17", "tok_1a"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1c"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://platform.openai.com/docs/api-reference/chat/create",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_m"],
+        "type": "variable"
+      }
+    ]
+  },
+  {
+    "url": "https://platform.openai.com/docs/guides/embeddings",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_b"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_m"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_n", "tok_r", "tok_v"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_11"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.anthropic.com/en/api/messages",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://realpython.com/python-lambda/",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://realpython.com/python-json/",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://realpython.com/async-io-python/",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_3", "tok_z"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_q", "tok_1c"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_5", "tok_f", "tok_1m"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_b", "tok_l"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_v"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1a", "tok_1i"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://realpython.com/python-requests/",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://realpython.com/python-type-checking/",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://dev.to/lydiahallie/javascript-visualized-event-loop-3dif",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1", "tok_1a"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_e", "tok_18"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_w", "tok_1c"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_i"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_7", "tok_n", "tok_12"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://www.freecodecamp.org/news/how-to-fetch-data-from-an-api-using-the-fetch-api-in-javascript/",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_0"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_5", "tok_g"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_b"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_m"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_r"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_x"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://www.freecodecamp.org/news/async-await-in-javascript/",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_6"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_9"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1", "tok_f", "tok_p"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://www.freecodecamp.org/news/destructuring-in-javascript/",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1", "tok_e", "tok_m", "tok_u"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_c"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_k"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_s"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_11", "tok_18", "tok_1f"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://stackoverflow.com/questions/111102/how-do-javascript-closures-work",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1", "tok_h"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_b"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_3", "tok_e"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_5"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_7"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_d"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://stackoverflow.com/questions/351409/how-to-append-something-to-an-array",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2", "tok_7", "tok_c"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_8"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_b"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://cn.vuejs.org/guide/essentials/computed.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_3"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://mode.com/sql-tutorial/sql-select-statement/",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_2"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_3"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_5", "tok_6"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://kubernetes.io/docs/concepts/workloads/pods/",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_0"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_1"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_2"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_3", "tok_6"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_4"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_5"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_7"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_8"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_9"],
+        "type": "variable"
+      }
+    ]
+  },
+  {
+    "url": "https://doc.rust-lang.org/book/ch08-01-vectors.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_4", "tok_6"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_5"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_7"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_4"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_7"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_9"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://www.typescriptlang.org/docs/handbook/2/mapped-types.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1", "tok_g"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://react.dev/reference/react/useMemo",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://react.dev/reference/react/useCallback",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://nodejs.org/api/stream.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://nodejs.org/api/buffer.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_8", "tok_f"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1", "tok_e", "tok_p", "tok_v", "tok_14", "tok_1g", "tok_1m"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_w", "tok_15", "tok_1h", "tok_1n"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_q"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.aws.amazon.com/cdk/v2/guide/resources.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2", "tok_6", "tok_c"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_7"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_d"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_e"],
+        "type": "variable"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_sns_code_examples.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_p", "tok_3"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_2", "tok_i"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_r", "tok_g"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_o", "tok_10"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_y", "tok_13", "tok_19"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_1e", "tok_15", "tok_1n"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_18"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1a", "tok_14"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_u", "tok_17", "tok_1d"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_1n"],
+        "type": "variable"
+      }
+    ]
+  },
+  {
+    "url": "https://realpython.com/python-data-classes/",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_6"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_1", "tok_4"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_1"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://svelte.dev/docs/introduction",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_6"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_4", "tok_i"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_g"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_f", "tok_j"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://vuejs.org/guide/essentials/reactivity-fundamentals.html",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_3"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_g"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_n", "tok_7", "tok_j"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_c"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.deno.com/runtime/fundamentals/typescript/",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://bun.sh/docs/api/http",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_47", "tok_1"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_49"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_4"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_3b", "tok_3"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_2z", "tok_2j", "tok_24"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_43"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_25", "tok_2k"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_30"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_3c"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_21"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_g", "tok_w", "tok_1k", "tok_3r"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://nextjs.org/docs/app/building-your-application/routing",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_3"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://docs.astro.build/en/getting-started/",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://tailwindcss.com/docs/installation",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://trpc.io/docs/quickstart",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1"],
+        "type": "object"
+      }
+    ]
+  },
+  {
+    "url": "https://gemini.google.com/share/56c7c7f982da",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_2c", "tok_e"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_k", "tok_s", "tok_u", "tok_12", "tok_1b"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_l"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_r"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1f"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_2b", "tok_2o", "tok_2w"],
+        "type": "object"
+      },
+      {
+        "ids": ["tok_2p", "tok_13"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_11"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1w", "tok_1s", "tok_1j", "tok_10", "tok_z"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_1i", "tok_p"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_1k"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_15", "tok_1m", "tok_1u"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_1a", "tok_1g"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_24", "tok_2d"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_2s"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_t"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_v"],
+        "type": "function"
+      }
+    ]
+  },
+  {
+    "url": "https://claude.ai/share/3bfa1831-a1a7-42c7-8a38-6db9fa605d48",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_1", "tok_1x"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1m", "tok_13"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_i"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_18"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_o"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_27", "tok_2m"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_1v"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_y", "tok_t", "tok_q", "tok_b"],
+        "type": "variable"
+      }
+    ]
+  },
+  {
+    "url": "https://grok.com/share/bGVnYWN5_1b5fb303-6a03-4225-8a30-5482b17feb9f?rid=81d264b2-7753-49b9-a1af-1696c06d300d",
+    "expectedAnnotations": [
+      {
+        "ids": ["tok_4"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_i"],
+        "type": "variable"
+      },
+      {
+        "ids": ["tok_38", "tok_2w", "tok_2k", "tok_28", "tok_1w", "tok_1k", "tok_18", "tok_3e"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_3h"],
+        "type": "function"
+      },
+      {
+        "ids": ["tok_2"],
+        "type": "function"
+      }
+    ]
+  }
+]

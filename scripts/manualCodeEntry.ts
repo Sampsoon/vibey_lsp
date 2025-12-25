@@ -1,33 +1,33 @@
 /**
  * Manual Code Entry Server
- * 
+ *
  * AI-generated code (Claude)
- * 
+ *
  * A local web server with a UI for manually adding code examples to the test dataset.
  * Use this to add examples from sites that can't be automatically scraped (e.g., AI chat
  * shares, sites with bot detection, or pages requiring authentication).
- * 
+ *
  * What it does:
  * - Serves a web UI at http://localhost:3456
  * - Lets you paste a URL and <code> block HTML
  * - Saves directly to test-data/code-examples.json on each add/delete
  * - Shows all current examples with their character counts
- * 
+ *
  * Usage:
- *   node scripts/manualCodeEntry.mjs
+ *   cd scripts && pnpm run manual
  *   # Then open http://localhost:3456 in your browser
- * 
+ *
  * How to add an example:
  *   1. Navigate to a page with code blocks
  *   2. Right-click the code block → Inspect
  *   3. Copy the <code>...</code> element's outer HTML
  *   4. Paste the URL and HTML into the form
  *   5. Click "Add Example" - saves immediately to file
- * 
+ *
  * Output: test-data/code-examples.json
  */
 
-import { createServer } from 'http';
+import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -36,7 +36,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = join(__dirname, '..', 'test-data', 'code-examples.json');
 const PORT = 3456;
 
-function ensureDataFile() {
+interface CodeExample {
+  url: string;
+  html: string;
+}
+
+function ensureDataFile(): void {
   const dir = dirname(DATA_PATH);
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
@@ -46,12 +51,12 @@ function ensureDataFile() {
   }
 }
 
-function readExamples() {
+function readExamples(): CodeExample[] {
   ensureDataFile();
   return JSON.parse(readFileSync(DATA_PATH, 'utf-8'));
 }
 
-function writeExamples(examples) {
+function writeExamples(examples: CodeExample[]): void {
   ensureDataFile();
   writeFileSync(DATA_PATH, JSON.stringify(examples, null, 2));
 }
@@ -315,7 +320,7 @@ const HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-const server = createServer((req, res) => {
+const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   if (req.method === 'GET' && req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(HTML);
@@ -330,16 +335,16 @@ const server = createServer((req, res) => {
 
   if (req.method === 'POST' && req.url === '/api/examples') {
     let body = '';
-    req.on('data', chunk => body += chunk);
+    req.on('data', (chunk: Buffer) => (body += chunk));
     req.on('end', () => {
       try {
-        const examples = JSON.parse(body);
+        const examples: CodeExample[] = JSON.parse(body);
         writeExamples(examples);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: e.message }));
+        res.end(JSON.stringify({ error: (e as Error).message }));
       }
     });
     return;
@@ -354,4 +359,3 @@ server.listen(PORT, () => {
   console.log(`  http://localhost:${PORT}\n`);
   console.log(`  Saving to: ${DATA_PATH}\n`);
 });
-

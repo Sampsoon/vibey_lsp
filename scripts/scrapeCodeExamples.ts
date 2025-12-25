@@ -1,21 +1,22 @@
 /**
  * Code Examples Scraper
- * 
+ *
  * AI-generated code (Claude)
- * 
+ *
  * This script scrapes code blocks from various documentation and tutorial websites
  * to build a test dataset for evaluating LLM prompt performance on hover hints.
- * 
+ *
  * What it does:
  * - Visits a curated list of URLs from docs sites (MDN, Python, Rust, etc.)
  * - Extracts the first valid <code> block from each page
  * - Saves results to test-data/code-examples.json
  * - Merges with existing data (won't duplicate URLs)
- * 
+ *
  * Usage:
+ *   cd scripts && pnpm install
  *   pnpm exec playwright install chromium   # First time only
- *   node scripts/scrapeCodeExamples.mjs
- * 
+ *   pnpm run scrape
+ *
  * Output: test-data/code-examples.json
  */
 
@@ -25,6 +26,11 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+interface CodeExample {
+  url: string;
+  html: string;
+}
 
 const URLS = [
   // MDN Web Docs (8)
@@ -156,8 +162,8 @@ const URLS = [
   'https://trpc.io/docs/quickstart',
 ];
 
-async function scrapeCodeExamples() {
-  const results = [];
+async function scrapeCodeExamples(): Promise<void> {
+  const results: CodeExample[] = [];
   const browser = await chromium.launch({ headless: true });
 
   console.log(`Starting to scrape ${URLS.length} URLs...`);
@@ -168,7 +174,8 @@ async function scrapeCodeExamples() {
 
     try {
       const context = await browser.newContext({
-        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        userAgent:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       });
       const page = await context.newPage();
 
@@ -179,14 +186,7 @@ async function scrapeCodeExamples() {
         const codeElements = document.querySelectorAll('code, pre code');
 
         for (const code of codeElements) {
-          if (code.querySelectorAll('span').length > 0) {
-            return code.outerHTML;
-          }
-        }
-
-        for (const code of codeElements) {
-          const text = code.textContent?.trim() || '';
-          if (text.length > 20) {
+          if (code.querySelectorAll('span').length > 1) {
             return code.outerHTML;
           }
         }
@@ -203,7 +203,7 @@ async function scrapeCodeExamples() {
 
       await context.close();
     } catch (error) {
-      console.log(`  ✗ Error: ${error.message}`);
+      console.log(`  ✗ Error: ${(error as Error).message}`);
     }
   }
 
@@ -213,19 +213,19 @@ async function scrapeCodeExamples() {
   mkdirSync(outputDir, { recursive: true });
 
   const outputPath = join(outputDir, 'code-examples.json');
-  
-  let existingData = [];
+
+  let existingData: CodeExample[] = [];
   if (existsSync(outputPath)) {
     try {
       existingData = JSON.parse(readFileSync(outputPath, 'utf-8'));
       console.log(`\nFound ${existingData.length} existing examples`);
-    } catch (e) {
+    } catch {
       console.log('\nCould not parse existing data, starting fresh');
     }
   }
 
-  const existingUrls = new Set(existingData.map(d => d.url));
-  const newResults = results.filter(r => !existingUrls.has(r.url));
+  const existingUrls = new Set(existingData.map((d) => d.url));
+  const newResults = results.filter((r) => !existingUrls.has(r.url));
   const combined = [...existingData, ...newResults];
 
   writeFileSync(outputPath, JSON.stringify(combined, null, 2));
