@@ -1,22 +1,23 @@
 import { readFileSync, existsSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { JSDOM } from 'jsdom';
-import OpenAI from 'openai';
-import { zodToJsonSchema } from 'zod-to-json-schema';
 
-import { RETRIEVAL_HOVER_HINTS_PROMPT } from '../src/coreFunctionality/serviceWorker/hoverHintRetrieval/prompt';
-import { hoverHintListSchema, HoverHintList } from '../src/coreFunctionality/hoverHints/types';
-import { tokenizeElement } from '../src/coreFunctionality/htmlProcessing';
-import { cleanHoverHintRetrievalHtml } from '../src/coreFunctionality/serviceWorker/hoverHintRetrieval';
+import {
+  RETRIEVAL_HOVER_HINTS_PROMPT,
+  cleanHoverHintRetrievalHtml,
+} from '../src/coreFunctionality/serviceWorker/hoverHintRetrieval';
+import { hoverHintListSchema, hoverHintSchema, HoverHint } from '../src/coreFunctionality/hoverHints';
+import { callLLMWithConfig, LlmParams } from '../src/coreFunctionality/llm';
+import { parseListOfObjectsFromStream } from '../src/coreFunctionality/stream';
+import { DEFAULT_MODEL, OPEN_ROUTER_API_URL, APIConfig } from '../src/storage';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const CODE_EXAMPLES_PATH = join(__dirname, '..', 'test-data', 'code-examples.json');
+const TOKENIZED_EXAMPLES_PATH = join(__dirname, '..', 'test-data', 'tokenized-examples.json');
 const ANNOTATIONS_PATH = join(__dirname, '..', 'test-data', 'annotated-examples.json');
 
-interface CodeExample {
+interface TokenizedExample {
   url: string;
-  html: string;
+  tokenizedHtml: string;
 }
 
 interface Annotation {
@@ -29,57 +30,20 @@ interface ExpectedAnnotation {
   type: string;
 }
 
-function generateDeterministicId(index: number): string {
-  return `tok_${index.toString(36)}`;
-}
+async function invokeHoverHintRetrieval(cleanedHtml: string, config: APIConfig): Promise<HoverHint[]> {
+  const llmParams: LlmParams = {
+    prompt: RETRIEVAL_HOVER_HINTS_PROMPT,
+    schema: hoverHintListSchema,
+  };
 
-function tokenizeAndCleanHtml(html: string): string {
-  const dom = new JSDOM(`<div id="root">${html}</div>`);
-  const doc = dom.window.document;
-  const root = doc.getElementById('root')!;
-
-  let tokenIndex = 0;
-  tokenizeElement(doc, root, {
-    generateId: () => {
-      const id = generateDeterministicId(tokenIndex);
-      tokenIndex++;
-      return id;
-    },
+  const hints: HoverHint[] = [];
+  const onParsedElement = parseListOfObjectsFromStream(hoverHintSchema, (hint) => {
+    hints.push(hint);
   });
 
-  return cleanHoverHintRetrievalHtml(root.innerHTML);
-}
+  await callLLMWithConfig(cleanedHtml, llmParams, config, onParsedElement);
 
-async function callLLM(cleanedHtml: string, apiKey: string, baseUrl: string, model: string): Promise<HoverHintList> {
-  const client = new OpenAI({
-    apiKey,
-    baseURL: baseUrl,
-  });
-
-  const jsonSchema = zodToJsonSchema(hoverHintListSchema);
-
-  const response = await client.chat.completions.create({
-    model,
-    messages: [
-      { role: 'system', content: RETRIEVAL_HOVER_HINTS_PROMPT },
-      { role: 'user', content: cleanedHtml },
-    ],
-    response_format: {
-      type: 'json_schema',
-      json_schema: {
-        strict: true,
-        name: 'hover_hints',
-        schema: jsonSchema as Record<string, unknown>,
-      },
-    },
-  });
-
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error('No response from LLM');
-  }
-
-  return JSON.parse(content) as HoverHintList;
+  return hints;
 }
 
 interface Metrics {
@@ -94,7 +58,7 @@ interface Metrics {
   actualCount: number;
 }
 
-function calculateMetrics(expected: ExpectedAnnotation[], actual: HoverHintList['hoverHintList']): Metrics {
+function calculateMetrics(expected: ExpectedAnnotation[], actual: HoverHint[]): Metrics {
   const expectedIds = new Set(expected.flatMap((ann) => ann.ids));
   const actualIds = new Set(actual.flatMap((hint) => hint.ids));
 
@@ -154,14 +118,12 @@ interface EvalResult {
   url: string;
   metrics?: Metrics;
   expected?: ExpectedAnnotation[];
-  actual?: HoverHintList['hoverHintList'];
+  actual?: HoverHint[];
   error?: string;
 }
 
 async function main() {
   const apiKey = process.env.OPENAI_API_KEY;
-  const baseUrl = process.env.OPENAI_BASE_URL || 'https://openrouter.ai/api/v1';
-  const model = process.env.OPENAI_MODEL || 'x-ai/grok-4.1-fast';
 
   if (!apiKey) {
     console.error('Error: OPENAI_API_KEY environment variable is required');
@@ -169,18 +131,25 @@ async function main() {
     process.exit(1);
   }
 
+  const config: APIConfig = {
+    key: apiKey,
+    url: OPEN_ROUTER_API_URL,
+    model: DEFAULT_MODEL,
+  };
+
   if (!existsSync(ANNOTATIONS_PATH)) {
     console.error('Error: No annotated examples found at', ANNOTATIONS_PATH);
     console.error('Run the annotation UI first: pnpm annotate');
     process.exit(1);
   }
 
-  if (!existsSync(CODE_EXAMPLES_PATH)) {
-    console.error('Error: No code examples found at', CODE_EXAMPLES_PATH);
+  if (!existsSync(TOKENIZED_EXAMPLES_PATH)) {
+    console.error('Error: No tokenized examples found at', TOKENIZED_EXAMPLES_PATH);
+    console.error('Run the tokenization script first: pnpm tokenize');
     process.exit(1);
   }
 
-  const codeExamples: CodeExample[] = JSON.parse(readFileSync(CODE_EXAMPLES_PATH, 'utf-8'));
+  const tokenizedExamples: TokenizedExample[] = JSON.parse(readFileSync(TOKENIZED_EXAMPLES_PATH, 'utf-8'));
   const annotations: Annotation[] = JSON.parse(readFileSync(ANNOTATIONS_PATH, 'utf-8'));
 
   const annotationsMap: Record<string, ExpectedAnnotation[]> = {};
@@ -188,7 +157,9 @@ async function main() {
     annotationsMap[ann.url] = ann.expectedAnnotations || [];
   });
 
-  const annotatedExamples = codeExamples.filter((ex) => annotationsMap[ex.url] && annotationsMap[ex.url].length > 0);
+  const annotatedExamples = tokenizedExamples.filter(
+    (ex) => annotationsMap[ex.url] && annotationsMap[ex.url].length > 0,
+  );
 
   if (annotatedExamples.length === 0) {
     console.error('Error: No annotated examples found');
@@ -199,8 +170,8 @@ async function main() {
   console.log(`\n${'='.repeat(60)}`);
   console.log('PROMPT EVALUATION');
   console.log('='.repeat(60));
-  console.log(`Model: ${model}`);
-  console.log(`Base URL: ${baseUrl}`);
+  console.log(`Model: ${config.model}`);
+  console.log(`Base URL: ${config.url}`);
   console.log(`Annotated examples: ${annotatedExamples.length}`);
   console.log('='.repeat(60) + '\n');
 
@@ -213,9 +184,8 @@ async function main() {
     console.log(`[${i + 1}/${annotatedExamples.length}] Evaluating: ${example.url.slice(0, 60)}...`);
 
     try {
-      const cleanedHtml = tokenizeAndCleanHtml(example.html);
-      const response = await callLLM(cleanedHtml, apiKey, baseUrl, model);
-      const actual = response.hoverHintList || [];
+      const cleanedHtml = cleanHoverHintRetrievalHtml(example.tokenizedHtml);
+      const actual = await invokeHoverHintRetrieval(cleanedHtml, config);
 
       const metrics = calculateMetrics(expected, actual);
       results.push({ url: example.url, metrics, expected, actual });

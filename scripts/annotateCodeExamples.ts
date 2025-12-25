@@ -31,20 +31,15 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { JSDOM } from 'jsdom';
-import {
-  CODE_DELIMITERS,
-  CODE_TOKEN_ID_NAME,
-  PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME,
-} from '../src/coreFunctionality/htmlProcessing';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const CODE_EXAMPLES_PATH = join(__dirname, '..', 'test-data', 'code-examples.json');
+const TOKENIZED_EXAMPLES_PATH = join(__dirname, '..', 'test-data', 'tokenized-examples.json');
 const ANNOTATIONS_PATH = join(__dirname, '..', 'test-data', 'annotated-examples.json');
 const PORT = 3457;
 
-interface CodeExample {
+interface TokenizedExample {
   url: string;
-  html: string;
+  tokenizedHtml: string;
 }
 
 interface Annotation {
@@ -57,11 +52,11 @@ interface AnnotationEntry {
   expectedAnnotations: Annotation[];
 }
 
-function loadCodeExamples(): CodeExample[] {
-  if (!existsSync(CODE_EXAMPLES_PATH)) {
+function loadTokenizedExamples(): TokenizedExample[] {
+  if (!existsSync(TOKENIZED_EXAMPLES_PATH)) {
     return [];
   }
-  return JSON.parse(readFileSync(CODE_EXAMPLES_PATH, 'utf-8'));
+  return JSON.parse(readFileSync(TOKENIZED_EXAMPLES_PATH, 'utf-8'));
 }
 
 function loadAnnotations(): AnnotationEntry[] {
@@ -75,107 +70,29 @@ function saveAnnotationsToFile(annotations: AnnotationEntry[]): void {
   writeFileSync(ANNOTATIONS_PATH, JSON.stringify(annotations, null, 2));
 }
 
-function generateDeterministicId(index: number): string {
-  return `tok_${index.toString(36)}`;
-}
-
-function breakIntoTokens(document: Document, elementContent: string): DocumentFragment {
-  const fragment = document.createDocumentFragment();
-
-  if (!elementContent.trim()) {
-    fragment.appendChild(document.createTextNode(elementContent));
-    return fragment;
-  }
-
-  let currentToken: string[] = [];
-  let isTraversingDelimiters = CODE_DELIMITERS.has(elementContent[0]);
-
-  for (const char of elementContent) {
-    const stateChanged = isTraversingDelimiters !== CODE_DELIMITERS.has(char);
-
-    if (stateChanged && isTraversingDelimiters) {
-      fragment.appendChild(document.createTextNode(currentToken.join('')));
-    } else if (stateChanged && !isTraversingDelimiters) {
-      const span = document.createElement('span');
-      span.setAttribute(PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME, 'true');
-      span.textContent = currentToken.join('');
-      fragment.appendChild(span);
-    }
-
-    if (stateChanged) {
-      isTraversingDelimiters = !isTraversingDelimiters;
-      currentToken = [];
-    }
-
-    currentToken.push(char);
-  }
-
-  if (currentToken.length > 0 && isTraversingDelimiters) {
-    fragment.appendChild(document.createTextNode(currentToken.join('')));
-  }
-
-  if (currentToken.length > 0 && !isTraversingDelimiters) {
-    const span = document.createElement('span');
-    span.setAttribute(PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME, 'true');
-    span.textContent = currentToken.join('');
-    fragment.appendChild(span);
-  }
-
-  return fragment;
-}
-
-function wrapTokensInSpans(document: Document, element: Element): void {
-  const childNodes = Array.from(element.childNodes);
-
-  childNodes.forEach((node) => {
-    if (node.nodeType === 3 && node.textContent?.trim()) {
-      const originalText = node.textContent;
-      const tokens = breakIntoTokens(document, originalText);
-
-      if (tokens.childNodes.length > 1) {
-        const parent = node.parentNode;
-        parent?.replaceChild(tokens, node);
-      }
-    } else if (node.nodeType === 1 && (node as Element).nodeName !== 'SPAN') {
-      wrapTokensInSpans(document, node as Element);
-    }
-  });
-}
-
-function getDomLeaves(element: Element): Element[] {
-  return Array.from(element.querySelectorAll('*')).filter((el) => el.children.length === 0);
-}
-
-function getTokenizedHtmlWithClickHandlers(html: string, existingAnnotations: Annotation[] = []): string {
-  const dom = new JSDOM(`<div id="root">${html}</div>`);
+function addClickHandlersToTokenizedHtml(tokenizedHtml: string, existingAnnotations: Annotation[] = []): string {
+  const dom = new JSDOM(`<div id="root">${tokenizedHtml}</div>`);
   const document = dom.window.document;
   const root = document.getElementById('root')!;
-
-  wrapTokensInSpans(document, root);
-
-  const leaves = getDomLeaves(root);
-  let tokenIndex = 0;
 
   const annotatedIdsWithType = new Map<string, string>();
   existingAnnotations.forEach((ann) => {
     ann.ids.forEach((id) => annotatedIdsWithType.set(id, ann.type));
   });
 
-  leaves.forEach((leaf) => {
-    if (leaf.textContent?.trim()) {
-      const tokenId = generateDeterministicId(tokenIndex);
-      const dataAttr = `data-${CODE_TOKEN_ID_NAME.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
-      leaf.setAttribute(dataAttr, tokenId);
-      leaf.classList.add('token');
-      leaf.setAttribute('onclick', `selectToken('${tokenId}', event)`);
+  const tokensWithIds = root.querySelectorAll('[data-token-id]');
+
+  tokensWithIds.forEach((element) => {
+    const tokenId = element.getAttribute('data-token-id');
+    if (tokenId) {
+      element.classList.add('token');
+      element.setAttribute('onclick', `selectToken('${tokenId}', event)`);
 
       const annotationType = annotatedIdsWithType.get(tokenId);
       if (annotationType) {
-        leaf.classList.add('annotated');
-        leaf.classList.add(`annotated-${annotationType}`);
+        element.classList.add('annotated');
+        element.classList.add(`annotated-${annotationType}`);
       }
-
-      tokenIndex++;
     }
   });
 
@@ -512,7 +429,7 @@ const HTML = `<!DOCTYPE html>
       fetch('/api/tokenize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ html: example.html, annotations: anns })
+        body: JSON.stringify({ tokenizedHtml: example.tokenizedHtml, annotations: anns })
       })
       .then(r => r.json())
       .then(data => {
@@ -730,7 +647,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
   }
 
   if (req.method === 'GET' && req.url === '/api/data') {
-    const examples = loadCodeExamples();
+    const examples = loadTokenizedExamples();
     const annotationsList = loadAnnotations();
 
     const annotationsMap: Record<string, Annotation[]> = {};
@@ -748,10 +665,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     req.on('data', (chunk: Buffer) => (body += chunk));
     req.on('end', () => {
       try {
-        const { html, annotations } = JSON.parse(body);
-        const tokenizedHtml = getTokenizedHtmlWithClickHandlers(html, annotations || []);
+        const { tokenizedHtml, annotations } = JSON.parse(body);
+        const htmlWithHandlers = addClickHandlersToTokenizedHtml(tokenizedHtml, annotations || []);
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ html: tokenizedHtml }));
+        res.end(JSON.stringify({ html: htmlWithHandlers }));
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: (e as Error).message }));
@@ -790,6 +707,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 server.listen(PORT, () => {
   console.log(`\n  Code Annotation UI running at:`);
   console.log(`  http://localhost:${PORT}\n`);
-  console.log(`  Loading examples from: ${CODE_EXAMPLES_PATH}`);
+  console.log(`  Loading examples from: ${TOKENIZED_EXAMPLES_PATH}`);
   console.log(`  Saving annotations to: ${ANNOTATIONS_PATH}\n`);
 });

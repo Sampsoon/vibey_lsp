@@ -1,8 +1,4 @@
-import { CODE_DELIMITERS, CODE_TOKEN_ID_NAME, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME } from './constants';
-
-export interface TokenizationOptions {
-  generateId: () => string;
-}
+import { CODE_DELIMITERS, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME } from './constants';
 
 function createProgrammaticallyAddedSpan(doc: Document, content: string): HTMLSpanElement {
   const span = doc.createElement('span');
@@ -74,16 +70,4 @@ export function wrapTokensInSpans(doc: Document, element: HTMLElement): void {
 
 export function getDomLeaves(element: HTMLElement): HTMLElement[] {
   return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
-}
-
-export function tokenizeElement(doc: Document, element: HTMLElement, options: TokenizationOptions): void {
-  wrapTokensInSpans(doc, element);
-
-  const leaves = getDomLeaves(element);
-
-  leaves.forEach((leaf) => {
-    if (leaf.textContent?.trim() && !leaf.dataset[CODE_TOKEN_ID_NAME]) {
-      leaf.dataset[CODE_TOKEN_ID_NAME] = options.generateId();
-    }
-  });
 }

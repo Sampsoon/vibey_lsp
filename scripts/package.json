@@ -4,9 +4,11 @@
   "type": "module",
   "scripts": {
     "scrape": "tsx scrapeCodeExamples.ts",
-    "manual": "tsx manualCodeEntry.ts", 
+    "manual": "tsx manualCodeEntry.ts",
     "annotate": "tsx annotateCodeExamples.ts",
-    "evaluate": "tsx evaluatePrompt.ts"
+    "evaluate": "tsx evaluatePrompt.ts",
+    "tokenize": "tsx tokenizeCodeExamples.ts",
+    "migrate": "tsx migrateAnnotations.ts"
   },
   "dependencies": {
     "playwright": "^1.49.1",

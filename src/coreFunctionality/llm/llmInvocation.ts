@@ -2,7 +2,7 @@ import { OpenAI } from 'openai';
 import * as z from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { ChatCompletionCreateParams } from 'openai/resources.mjs';
-import { getAPIKeyConfig } from '../../storage';
+import { getAPIKeyConfig, APIConfig } from '../../storage';
 import { Json } from '../../shared';
 
 export interface LlmParams {
@@ -29,20 +29,23 @@ async function invokeOpenRouterClient(
   }
 }
 
-export async function callLLM(input: string, llmParams: LlmParams, onChunk: (chunk: string) => void) {
+export async function callLLMWithConfig(
+  input: string,
+  llmParams: LlmParams,
+  config: APIConfig,
+  onChunk: (chunk: string) => void,
+) {
   const { prompt, schema } = llmParams;
 
   const jsonSchema = zodToJsonSchema(schema);
 
-  const apiKeyConfig = await getAPIKeyConfig();
-
   const client = new OpenAI({
-    apiKey: apiKeyConfig.key,
-    baseURL: apiKeyConfig.url,
+    apiKey: config.key,
+    baseURL: config.url,
   });
 
   const params: Json & ChatCompletionCreateParams = {
-    model: apiKeyConfig.model,
+    model: config.model,
     messages: [
       {
         role: 'system',
@@ -61,8 +64,13 @@ export async function callLLM(input: string, llmParams: LlmParams, onChunk: (chu
         schema: jsonSchema,
       },
     },
-    ...(apiKeyConfig.additionalArguments ?? {}),
+    ...(config.additionalArguments ?? {}),
   };
 
   await invokeOpenRouterClient(client, params, onChunk);
+}
+
+export async function callLLM(input: string, llmParams: LlmParams, onChunk: (chunk: string) => void) {
+  const config = await getAPIKeyConfig();
+  await callLLMWithConfig(input, llmParams, config, onChunk);
 }

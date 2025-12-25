@@ -1,2 +1,2 @@
-export { callLLM } from './llmInvocation';
+export { callLLM, callLLMWithConfig } from './llmInvocation';
 export type { LlmParams } from './llmInvocation';
