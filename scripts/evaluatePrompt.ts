@@ -27,7 +27,6 @@ const TOKENIZED_EXAMPLES_PATH = join(__dirname, '..', 'test-data', 'tokenized-ex
 const ANNOTATIONS_PATH = join(__dirname, '..', 'test-data', 'annotated-examples.json');
 const EVAL_REPORT_PATH = join(__dirname, '..', 'test-data', 'eval-report.json');
 
-const CONCURRENCY = 5;
 const MAX_RETRIES = 5;
 const INITIAL_BACKOFF_MS = 1000;
 
@@ -263,24 +262,6 @@ async function evaluateExample(task: EvalTask, config: APIConfig, total: number)
   }
 }
 
-async function runWithConcurrency<T, R>(items: T[], concurrency: number, fn: (item: T) => Promise<R>): Promise<R[]> {
-  const results: R[] = new Array(items.length);
-  let nextIndex = 0;
-
-  async function worker(): Promise<void> {
-    while (nextIndex < items.length) {
-      const currentIndex = nextIndex++;
-      results[currentIndex] = await fn(items[currentIndex]);
-    }
-  }
-
-  const workers = Array(Math.min(concurrency, items.length))
-    .fill(null)
-    .map(() => worker());
-  await Promise.all(workers);
-
-  return results;
-}
 
 async function main() {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -333,7 +314,7 @@ async function main() {
   console.log(`Model: ${config.model}`);
   console.log(`Base URL: ${config.url}`);
   console.log(`Annotated examples: ${annotatedExamples.length}`);
-  console.log(`Concurrency: ${CONCURRENCY}`);
+  console.log(`Concurrency: unlimited (parallel)`);
   console.log('='.repeat(60) + '\n');
 
   const tasks: EvalTask[] = annotatedExamples.map((example, index) => ({
@@ -342,8 +323,8 @@ async function main() {
     expected: annotationsMap[example.url],
   }));
 
-  const results = await runWithConcurrency(tasks, CONCURRENCY, (task) =>
-    evaluateExample(task, config, annotatedExamples.length),
+  const results = await Promise.all(
+    tasks.map((task) => evaluateExample(task, config, annotatedExamples.length)),
   );
 
   console.log(`\n${'='.repeat(60)}`);
