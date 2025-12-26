@@ -42,15 +42,10 @@ The following design is for a Chrome extension that will identify code blocks in
 * Scrub inputs to service workers
 * Scrub output html such as the style map
 * Have ability to select local LLMs
-* Have toggle to add button to code blocks that when clicked generates suggestions
 * Keep popup on screen when user moves mouse over it
-* have ability to add custom key value pairs with custom endpoint
-
-### UI
-* Have ability for users to select permissions of chrome extension during setup 
-* Have ability to exclude websites 
 
 ### Bugs
+* Fix tokenization logic for https://chatgpt.com/share/694c558b-ee84-800b-9152-c7a3e8d52c3c
 * Fix bug where IDs may be hallucinated?
 ```
     > processCodeBlocks.ts-1AjmrRd_.js:1 Code token with id xp2n6 not found in idToCodeTokenMap
