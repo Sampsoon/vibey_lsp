@@ -49,6 +49,40 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+class ProgressBar {
+  private total: number;
+  private completed: number = 0;
+  private successful: number = 0;
+  private failed: number = 0;
+  private width: number = 40;
+
+  constructor(total: number) {
+    this.total = total;
+  }
+
+  update(success: boolean): void {
+    this.completed++;
+    if (success) {
+      this.successful++;
+    } else {
+      this.failed++;
+    }
+    this.render();
+  }
+
+  private render(): void {
+    const percent = this.completed / this.total;
+    const filled = Math.round(this.width * percent);
+    const empty = this.width - filled;
+    const bar = '█'.repeat(filled) + '░'.repeat(empty);
+    const status = `[${bar}] ${this.completed}/${this.total} (✓${this.successful} ✗${this.failed})`;
+    process.stdout.write(`\r${status}`);
+    if (this.completed === this.total) {
+      process.stdout.write('\n');
+    }
+  }
+}
+
 function isRetryableError(error: unknown): boolean {
   if (error instanceof Error) {
     const message = error.message.toLowerCase();
@@ -228,9 +262,8 @@ interface EvalTask {
   expected: ExpectedAnnotation[];
 }
 
-async function evaluateExample(task: EvalTask, config: APIConfig, total: number): Promise<ExampleResult> {
-  const { index, example, expected } = task;
-  console.log(`[${index + 1}/${total}] Evaluating: ${example.url.slice(0, 60)}...`);
+async function evaluateExample(task: EvalTask, config: APIConfig, progress: ProgressBar): Promise<ExampleResult> {
+  const { example, expected } = task;
 
   try {
     const cleanedHtml = cleanHoverHintRetrievalHtml(example.tokenizedHtml);
@@ -239,9 +272,7 @@ async function evaluateExample(task: EvalTask, config: APIConfig, total: number)
     const comparison = buildComparison(expected, actual);
     const metrics = calculateMetrics(expected, actual, comparison);
 
-    console.log(
-      `  [${index + 1}] ✓ P: ${(metrics.precision * 100).toFixed(0)}%, R: ${(metrics.recall * 100).toFixed(0)}%, F1: ${(metrics.f1 * 100).toFixed(0)}%`,
-    );
+    progress.update(true);
 
     return {
       url: example.url,
@@ -253,7 +284,7 @@ async function evaluateExample(task: EvalTask, config: APIConfig, total: number)
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.log(`  [${index + 1}] ✗ Error: ${errorMessage}`);
+    progress.update(false);
     return {
       url: example.url,
       tokenizedHtml: example.tokenizedHtml,
@@ -314,7 +345,6 @@ async function main() {
   console.log(`Model: ${config.model}`);
   console.log(`Base URL: ${config.url}`);
   console.log(`Annotated examples: ${annotatedExamples.length}`);
-  console.log(`Concurrency: unlimited (parallel)`);
   console.log('='.repeat(60) + '\n');
 
   const tasks: EvalTask[] = annotatedExamples.map((example, index) => ({
@@ -323,8 +353,9 @@ async function main() {
     expected: annotationsMap[example.url],
   }));
 
+  const progress = new ProgressBar(tasks.length);
   const results = await Promise.all(
-    tasks.map((task) => evaluateExample(task, config, annotatedExamples.length)),
+    tasks.map((task) => evaluateExample(task, config, progress)),
   );
 
   console.log(`\n${'='.repeat(60)}`);
