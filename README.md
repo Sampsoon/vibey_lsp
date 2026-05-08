@@ -16,12 +16,6 @@ Works on documentation sites and AI chat apps like ChatGPT and Claude.
 
 ## Installation
 
-### Chrome Web Store
-
-[Install from Chrome Web Store](https://chromewebstore.google.com/detail/glibgenldljgejmnkoodobacbkipinik)
-
-### Manual Install
-
 1. Build the extension:
 
 ```bash
